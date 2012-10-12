@@ -3,8 +3,8 @@
 k1 = 3; k2 = 7;  % control the amout of vortices on the testFunction
 
 % Setting up the FD_DivFreeMatrix function:
-N = 2;           % Degree of the bivariate polynomial
-m = 2;           % Degree of the univariate polynomial
+N = 3;           % Degree of the bivariate polynomial
+m = 3;           % Degree of the univariate polynomial
 numPts = 3;      % The main stecil will have numPts^2 points
 
 
@@ -67,4 +67,10 @@ figure(1)
 loglog(nn,uxErr,'r.-', nn,uyErr,'b.-', nn,nn.^-2,'b--', nn,nn.^-4,'r--')
 legend('uxErr','uyErr','N^{-2}','N^{-4}','Location','Best')
 title('Error on u derivatives')
+xlabel('N'), ylabel('Error')
+
+figure(2)
+loglog(nn,vxErr,'r.-', nn,vyErr,'b.-', nn,nn.^-2,'r--', nn,nn.^-4,'b--')
+legend('vxErr','vyErr','N^{-2}','N^{-4}','Location','Best')
+title('Error on v derivatives')
 xlabel('N'), ylabel('Error')

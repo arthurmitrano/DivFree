@@ -27,8 +27,8 @@ end
 syms x y h
 
 % Interpolating polynomial of the form sum_i(sum_j(a_{ij} * x^i * y^j))
-u = [kron(x.^(0:N),y.^(1:N)) y.^(0:m)];
-v = [kron(x.^(1:N),y.^(0:N)) x.^(0:m)];
+u = [kron(x.^(1:N),y.^(0:N)) y.^(0:m)];
+v = [kron(x.^(0:N),y.^(1:N)) x.^(0:m)];
 ux = diff(u, x); % ux and vy are used to impose div-free condition, they 
 vy = diff(v, y); % are also returned as output and, just like
 uy = diff(u, y); % uy and vx, are returned as output for calculating the 
