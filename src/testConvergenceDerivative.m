@@ -10,8 +10,8 @@ numPts = 3;      % The main stecil will have numPts^2 points
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = [];  % Derivative errors
 
-nn = 3:10:200; % The code only works for N odd, will get non-integer index
-              % otherwise
+nn = 7:10:100; % The code only works for n odd, will get non-integer index
+               % otherwise
 for n = nn
     tic
     xx = linspace(-1,1,n);
@@ -20,30 +20,37 @@ for n = nn
     h = abs(xx(2) - xx(1));
     
     [u, v, ux, vx, uy, vy] = testFunction(X, Y, k1, k2);
-    uxAtO_Exact = ux( (length(xx) + 1)/2 , (length(yy) + 1)/2 );
-    uyAtO_Exact = uy( (length(xx) + 1)/2 , (length(yy) + 1)/2 );
-    vxAtO_Exact = vx( (length(xx) + 1)/2 , (length(yy) + 1)/2 );
-    vyAtO_Exact = vy( (length(xx) + 1)/2 , (length(yy) + 1)/2 );
+    
+    gridCenterX = (length(xx) + 1)/2; gridCenterY = (length(yy) + 1)/2;
+    uxAtO_Exact = ux(gridCenterX, gridCenterY);
+    uyAtO_Exact = uy(gridCenterX, gridCenterY);
+    vxAtO_Exact = vx(gridCenterX, gridCenterY);
+    vyAtO_Exact = vy(gridCenterX, gridCenterY);
     % NOTE: We are using length to get the analytical derivative at zero, 
-    % for now that what we want to focus on. Later on, we will generalize
+    % for now that is what we want to focus on. Later, we will generalize
     % this code for different stencil position.
     
-    %[dxFD, dyFD] = FD_DivFreeDiff(u, v, h, numPts, degree, extraTerms);
-    uInterpPts = []; % Extra interpolation points for component U
-    vInterpPts = []; % Extra interpolation points for component V
+    yPts = gridCenterY-2:gridCenterY+2;
+    xPts = gridCenterX-2:gridCenterX+2;
+    uInterpPts = [xx(gridCenterX)*ones(size((-2:2)')) yy(yPts)']; % Extra interpolation points for component U
+    %uInterpPts = [];
+    vInterpPts = [xx(gridCenterX)*ones(size((-2:2)')) yy(yPts)']; % Extra interpolation points for component V
+    %vInterpPts = [];
     
-    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrix(N, m, numPts, uInterpPts, ...
-                                           vInterpPts);
+    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrix(N, m, numPts, ...
+                                                   uInterpPts, vInterpPts);
     
     M = M(h);       % Fix M for the stencil 
     Minv = pinv(M); % Calculate the inverse on the least-square sense
     
     idx = (-(numPts-1)/2:(numPts-1)/2); % stencil on x (or y) direction
-    I = (length(xx) + 1)/2 + idx; % This will change on the future. Using 
-    J = (length(yy) + 1)/2 + idx; % length to get a stencil center at 0
+    I = gridCenterX + idx; % This will change on the future. Using 
+    J = gridCenterY + idx; % length to get a stencil center at 0
     
     U = u(I,J); V = v(I,J);  % Selects the points of the stencil
-    coeff = Minv*[U(:); V(:); zeros([numPts^2,1])];  % Get poly coeffs
+    U = U(:); V = V(:);
+    U = [U; u(yPts,gridCenterX)]; V = [V; v(yPts,gridCenterX) ];
+    coeff = Minv*[U; V; zeros([numPts^2,1])];  % Get poly coeffs
     
     % Numerical derivatives (ineficient code, will replace when we decide 
     % on the format of the interpolant):

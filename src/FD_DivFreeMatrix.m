@@ -7,8 +7,8 @@ function [M, u, v, ux, uy, vx, vy] = FD_DivFreeMatrix(N, m, numPts, ...
 % N          : degree of the bivariate polynomial
 % m          : degree of the univariate polynomial
 % numPts     : sqrt of the total number of points of the stecil (default=3)
-% uInterpPts : additional interpolation points, totalPts x 2 matrix
-% vInterpPts : additional interpolation points, totalPts x 2 matrix
+% uInterpPts : additional interpolation points, additionalPts x 2 matrix
+% vInterpPts : additional interpolation points, additionalPts x 2 matrix
 % Output: all annonymous functions
 % M              : matrix(h) to be inverted to find the desired polynomial
 % ux, uy, vx, vy : depends on (x,y), useful to calculate the numerical
