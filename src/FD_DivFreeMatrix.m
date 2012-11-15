@@ -1,4 +1,4 @@
-function [M, u, v, ux, uy, vx, vy] = FD_DivFreeMatrix(N, m, numPts, ...
+function [M, u, v, ux, uy, vx, vy] = FD_DivFreeMatrix(h, N, m, numPts, ...
                                                 uInterpPts, vInterpPts)
 % Generate the interpolation matrix to get the coeffs of the interpolating
 % polynomial on a stencil with equally spaced points in both directions 
@@ -24,51 +24,64 @@ if (nargin < 4)
     vInterpPts = [];
 end
 
-syms x y h
+syms x y
+
+% Defining stream function
+S = kron(x.^(0:N),y.^(0:N));
+Sx = diff(S, x); Sy = diff(S, y);
+u = Sy; v = -Sx;  % div(rot( (0,0,S) )) = 0
+%  u(u == 0) = []; v(v == 0) = []; % Taking out the zero coeffs
 
 % Interpolating polynomial of the form sum_i(sum_j(a_{ij} * x^i * y^j))
-u = [kron(x.^(1:N),y.^(0:N)) y.^(0:m)];
-v = [kron(x.^(0:N),y.^(1:N)) x.^(0:m)];
+% u = [kron(x.^(1:N),y.^(0:N)) y.^(0:m)];
+% v = [kron(x.^(0:N),y.^(1:N)) x.^(0:m)];
 ux = diff(u, x); % ux and vy are used to impose div-free condition, they 
 vy = diff(v, y); % are also returned as output and, just like
 uy = diff(u, y); % uy and vx, are returned as output for calculating the 
 vx = diff(v, x); % numerical derivatives.
 
-u = matlabFunction(u);
-v = matlabFunction(v);
-ux = matlabFunction(ux);
-vy = matlabFunction(vy);
-uy = matlabFunction(uy);
-vx = matlabFunction(vx);
+u = matlabFunction(u,'vars',[x y]);
+v = matlabFunction(v,'vars',[x y]);
 
-[X, Y] = meshgrid( h*(-(numPts-1)/2:1:(numPts-1)/2) ); % Generates stecil
+ux = matlabFunction(ux,'vars',[x y]);
+vy = matlabFunction(vy,'vars',[x y]);
+uy = matlabFunction(uy,'vars',[x y]);
+vx = matlabFunction(vx,'vars',[x y]);
+
+% Generates 3x3 stecil
+[X, Y] = meshgrid( h*(-(numPts-1)/2:1:(numPts-1)/2) ); 
 
 % The interpolation matrix will be constructed line by line
-Du = [];
-Dv = [];
-Dux = [];
-Dvy = [];
+Du = zeros(length(X(:)),(N+1)*(N+1));
+Dv = zeros(length(X(:)),(N+1)*(N+1)); % There are (N+1)*N coeffs
+% Dux = [];
+% Dvy = [];
 for i = 1:length(X(:))
-    Du = [Du; u(X(i),Y(i))];   % Add interpolation condition for @ (X,Y)(i)
-    Dv = [Dv; v(X(i),Y(i))];   % on both components of the vector field
-    Dux = [Dux; ux(X(i),Y(i))]; % This last two lines add the divFree 
-    Dvy = [Dvy; vy(X(i),Y(i))]; % condition.
-end
-% Adding interpolation condition for function u, using uInterpPts
-for i = 1:length(uInterpPts)
-    Du = [Du; u(uInterpPts(i,1),uInterpPts(i,2))];
-end
-% Adding interpolation condition for function v, using vInterpPts
-for i = 1:length(vInterpPts)
-    Dv = [Dv; v(vInterpPts(i,1),vInterpPts(i,2))];
+    Du(i,:) = u(X(i),Y(i)); % Add interpolation condition for @ (X,Y)(i)
+    Dv(i,:) = v(X(i),Y(i)); % on both components of the vector field
+    
+%     Du = [Du; u(X(i),Y(i))];   % Add interpolation condition for @ (X,Y)(i)
+%     Dv = [Dv; v(X(i),Y(i))];   % on both components of the vector field
+%     Dux = [Dux; ux(X(i),Y(i))]; % This last two lines add the divFree 
+%     Dvy = [Dvy; vy(X(i),Y(i))]; % condition.
 end
 
-Ou = zeros(size(Du));
-Ov = zeros(size(Dv));
-M = [Du  Ou; ...     % This matrix has this particular format to impose the
-     Ov  Dv; ...     % interpolation conditions and the divergence free
-     Dux Dvy];       % condition. See below for more information.
-M = matlabFunction(M);
+% % Adding interpolation condition for function u, using uInterpPts
+% for i = 1:length(uInterpPts)
+%     Du = [Du; u(uInterpPts(i,1),uInterpPts(i,2))];
+% end
+% % Adding interpolation condition for function v, using vInterpPts
+% for i = 1:length(vInterpPts)
+%     Dv = [Dv; v(vInterpPts(i,1),vInterpPts(i,2))];
+% end
+
+% Ou = zeros(size(Du));
+% Ov = zeros(size(Dv));
+M = [Du; ...     % This matrix has this particular format to impose the
+     Dv];        % interpolation conditions. Divergence free condition 
+                     % comes from the stream function now. See below for 
+                     % more information.
+% M = matlabFunction(M);
 
 % The idea here is that M*coeffs = f, where
 % coeffs = [a(:) b(:)], 
