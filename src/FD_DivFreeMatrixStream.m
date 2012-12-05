@@ -21,13 +21,14 @@ syms x y
 
 % Defining stream function and divFree interpolant
 S = kron(x.^(0:N),y.^(0:N));
+S([1]) = [];
 Sx = diff(S, x); v = -Sx;
 Sy = diff(S, y); u = +Sy;   % div(rot( (0,0,S) )) = 0
-u = u(2:end); v = v(2:end); % Taking out the zero coefficient
+%u = u(2:end); v = v(2:end); % Taking out the zero coefficient
 
-ux = diff(u, x); % ux and vy are used to impose div-free condition, and, 
+ux = diff(u, x,2); % ux and vy are used to impose div-free condition, and, 
 vy = diff(v, y); % just like uy and vx, are returned as numerical 
-uy = diff(u, y); % derivatives.
+uy = diff(u, y,2); % derivatives.
 vx = diff(v, x);
 
 u = matlabFunction(u,'vars',[x y]);
@@ -45,8 +46,8 @@ Xv = X(interpPts.v); Yv = Y(interpPts.v);
 % -------------------------------------------------------
 
 % The interpolation matrix will be constructed line by line ---------------
-Du = zeros(length(Xu(:)),(N+1)^2 - 1);
-Dv = zeros(length(Xv(:)),(N+1)^2 - 1); % There are (N+1)^2 - 1 coeffs
+Du = zeros(length(Xu(:)),length(S));
+Dv = zeros(length(Xv(:)),length(S)); % There are (N+1)^2 - 1 coeffs
 
 for i = 1:length(Xu(:))
     Du(i,:) = u(Xu(i),Yu(i)); % Add interpolation condition for u
