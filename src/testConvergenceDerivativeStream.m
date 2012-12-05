@@ -4,9 +4,7 @@ k1 = 3; k2 = 7;  % control the amout of vortices on the testFunction
 
 % Setting up the FD_DivFreeMatrix function:
 N = 3;           % Degree of the bivariate polynomial
-m = 3;           % Degree of the univariate polynomial
 numPts = 3;      % The main stecil will have numPts^2 points
-
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 uxErrFD = []; uyErrFD = []; vxErrFD = []; vyErrFD = []; % Trad diff errors
@@ -15,65 +13,70 @@ nn = 11:20:200; % The code only works for n odd, will get non-integer index
                 % otherwise
 for n = nn
     tic
-    xx = linspace(-1,1,n);
-    yy = linspace(-1,1,n);
+    
+    % Generating 2d-grid n^2 pts equally-spaced --
+    xx = linspace(-1,1,n);  yy = linspace(-1,1,n);
     [X, Y] = meshgrid(xx, yy);
     h = abs(xx(2) - xx(1));
+    % --------------------------------------------
     
-    [u, v, ux, vx, uy, vy] = testFunction(X, Y, k1, k2);
+    % Getting testFunction values ------------------------------
+    [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2);
+    uxAtO_Exact = ux;
+    uyAtO_Exact = uy;
+    vxAtO_Exact = vx;
+    vyAtO_Exact = vy;
+    % ----------------------------------------------------------
     
-    gridCenterX = (length(xx) + 1)/2; gridCenterY = (length(yy) + 1)/2;
-    uxAtO_Exact = ux(gridCenterX, gridCenterY);
-    uyAtO_Exact = uy(gridCenterX, gridCenterY);
-    vxAtO_Exact = vx(gridCenterX, gridCenterY);
-    vyAtO_Exact = vy(gridCenterX, gridCenterY);
-    % NOTE: We are using length to get the analytical derivative at zero, 
-    % for now that is what we want to focus on. Later, we will generalize
-    % this code for different stencil position.
+    % Not using extra interpolation points anymore!
     
-    % Extra interpolation points for component U
-%     yPts = [gridCenterY-2 gridCenterY+2]; % Add 2 points to the stencil
-%     uInterpPts = [xx(gridCenterX)*[1; 1] yy(yPts)']; 
-    uInterpPts = [];
-    % Extra interpolation points for component V
-%     xPts = [gridCenterX-2 gridCenterX+2]; % Add 2 points to the stencil
-%     vInterpPts = [xx(xPts)' yy(gridCenterY)*[1; 1]]; 
-    vInterpPts = [];
+    % Selecting points to interpolate -----------------------------
+    uIdx = find(load('uInterpPts.txt') == 1);
+    vIdx = find(load('vInterpPts.txt') == 1);
+    interpPts = struct('u', uIdx,'v', vIdx); % using linear indexes
+    % -------------------------------------------------------------
     
-    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrixStream(h, N, m, numPts, ...
-                                                   uInterpPts, vInterpPts);
+    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrixStream(h, N, numPts, ...
+                                                         interpPts);
     
-%     M = M(h);       % Fix M for the stencil 
-    Minv = pinv(M); % Calculate the inverse on the least-square sense
+%     M = M(h);       % Fix M for the stencil %% MIGHT be useful later on.
     
-    idx = (-(numPts-1)/2:(numPts-1)/2); % stencil on x (or y) direction
-    I = gridCenterX + idx; % This will change on the future. Using 
-    J = gridCenterY + idx; % length to get a stencil center at 0
-    U = u(I,J); V = v(I,J);  % Selects the points of the stencil
-    % Adding extra interpolation conditions
-    U = U(:); V = V(:);
-%     U = [U; u(yPts,gridCenterX)]; V = [V; v(gridCenterY,xPts)' ];
+    % Selecting interpolation points of the stencil -----------------------
+    [Iu, Ju] = ind2sub([numPts numPts], uIdx); % Converting linear indexes
+    [Iv, Jv] = ind2sub([numPts numPts], vIdx); % to traditional ones
     
-    coeff = M\[U; V;];  % Get poly coeffs
+    Iu = (Iu-2) + origin.i;
+    Ju = (Ju-2) + origin.j;
+    Iv = (Iv-2) + origin.i;
+    Jv = (Jv-2) + origin.j;
+    % NOTE: this only works for a stencil of 3x3, for now. Need to use
+    % numPts to generalize.
+    U = u(sub2ind([n n], Iu, Ju)); % Converting back to linear 
+    V = v(sub2ind([n n], Iv, Jv)); % indexes for selection issues 
+    % ---------------------------------------------------------------------
     
-    % Numerical derivatives (ineficient code, will replace when we decide 
+    % No more extra interpolation points code!
+    
+    coeffs = M\[U; V;];  % Get polynomial coefficients
+    
+    % Numerical derivatives (inefficient code, will replace when we decide 
     % on the format of the interpolant):
-    numUnknows = length(coeff);
-    uxAtO = ux(0,0)*coeff;
-    uyAtO = uy(0,0)*coeff;
-    vxAtO = vx(0,0)*coeff;
-    vyAtO = vy(0,0)*coeff;
-    uAtO = t1(0,0)*coeff;
-    vAtO = t2(0,0)*coeff;
+    numUnknows = length(coeffs);
+    uxAtO = ux(0,0)*coeffs;
+    uyAtO = uy(0,0)*coeffs;
+    vxAtO = vx(0,0)*coeffs;
+    vyAtO = vy(0,0)*coeffs;
+    uAtO = t1(0,0)*coeffs;
+    vAtO = t2(0,0)*coeffs;
+    % ---------------------------------------------------------------------
     
-    % Measuring the error for divFree method:
+    % Measuring the error for divFree method -
     uxErr = [uxErr; abs(uxAtO - uxAtO_Exact)];
     uyErr = [uyErr; abs(uyAtO - uyAtO_Exact)];
     vxErr = [vxErr; abs(vxAtO - vxAtO_Exact)];
     vyErr = [vyErr; abs(vyAtO - vyAtO_Exact)];
-    
+    % ----------------------------------------
     toc
-    
     n
 end
 
