@@ -1,11 +1,13 @@
-function [M, u, v, ux, uy, vx, vy] = FD_DivFreeMatrixStream(h, N, numPts, interpPts)
+function [M, u, v, ux, uy, vx, vy] = ...
+         FD_DivFreeMatrixStream(h, N, interpPts, k)
 % Generate the interpolation matrix to get the coeffs of the interpolating
 % polynomial on a stencil with equally spaced points in both directions 
 % with numPts^2 points.
 % INPUT:
+% h          : dx and dy of the stencil
 % N          : degree of the bivariate polynomial
-% numPts     : sqrt of the total number of points of the stecil (default=3)
 % interpPts  : struct with the interpolation points indexes
+% k          : order of the derivative to be taken (default = 1)
 % OUTPUT: all annonymous functions
 % M              : matrix(h) to be inverted to find the desired polynomial
 % ux, uy, vx, vy : depends on (x,y), useful to calculate the numerical
@@ -13,23 +15,23 @@ function [M, u, v, ux, uy, vx, vy] = FD_DivFreeMatrixStream(h, N, numPts, interp
 % NOTE: the output derivatives might be removed in the future, when we
 % decide on the final format of the interpolant.
 
-if (nargin < 3)
-    numPts = 3;
+if (nargin < 4)
+    k = 1;
 end
+numPts = interpPts.numPts;  % The sqrt of the total number of pts
 
 syms x y
 
 % Defining stream function and divFree interpolant
 S = kron(x.^(0:N),y.^(0:N));
-S([1]) = [];
+S([1]) = []; % Taking out the constant coefficient
 Sx = diff(S, x); v = -Sx;
 Sy = diff(S, y); u = +Sy;   % div(rot( (0,0,S) )) = 0
-%u = u(2:end); v = v(2:end); % Taking out the zero coefficient
 
-ux = diff(u, x,2); % ux and vy are used to impose div-free condition, and, 
-vy = diff(v, y); % just like uy and vx, are returned as numerical 
-uy = diff(u, y,2); % derivatives.
-vx = diff(v, x);
+ux = diff(u, x, k); % ux and vy are used to impose div-free condition, and, 
+vy = diff(v, y, k); % just like uy and vx, are returned as numerical 
+uy = diff(u, y, k); % derivatives.
+vx = diff(v, x, k);
 
 u = matlabFunction(u,'vars',[x y]);
 v = matlabFunction(v,'vars',[x y]);

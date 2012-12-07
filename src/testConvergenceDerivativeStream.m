@@ -5,6 +5,7 @@ k1 = 3; k2 = 7;  % control the amout of vortices on the testFunction
 % Setting up the FD_DivFreeMatrix function:
 N = 3;           % Degree of the bivariate polynomial
 numPts = 3;      % The main stecil will have numPts^2 points
+k = 1;           % Order of the derivative
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 uxErrFD = []; uyErrFD = []; vxErrFD = []; vyErrFD = []; % Trad diff errors
@@ -21,7 +22,7 @@ for n = nn
     % --------------------------------------------
     
     % Getting testFunction values ------------------------------
-    [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2);
+    [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2,k);
     uxAtO_Exact = ux;
     uyAtO_Exact = uy;
     vxAtO_Exact = vx;
@@ -30,14 +31,13 @@ for n = nn
     
     % Not using extra interpolation points anymore!
     
-    % Selecting points to interpolate -----------------------------
+    % Selecting points to interpolate ------------------------------
     uIdx = find(load('uInterpPts.txt') == 1);
-    vIdx = find(load('vInterpPts.txt') == 1);
-    interpPts = struct('u', uIdx,'v', vIdx); % using linear indexes
-    % -------------------------------------------------------------
+    vIdx = find(load('vInterpPts.txt') == 1); % using linear indexes
+    interpPts = struct('u', uIdx,'v', vIdx, 'numPts',numPts); 
+    % --------------------------------------------------------------
     
-    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrixStream(h, N, numPts, ...
-                                                         interpPts);
+    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrixStream(h,N,interpPts,k);
     
 %     M = M(h);       % Fix M for the stencil %% MIGHT be useful later on.
     
