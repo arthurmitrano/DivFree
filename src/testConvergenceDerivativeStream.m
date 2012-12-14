@@ -3,9 +3,9 @@
 k1 = 3; k2 = 7;  % control the amout of vortices on the testFunction
 
 % Setting up the FD_DivFreeMatrix function:
-N = 3;           % Degree of the bivariate polynomial
+N = 4;           % Degree of the bivariate polynomial
 numPts = 3;      % The main stecil will have numPts^2 points
-k = 1;           % Order of the derivative
+k = 2;           % Order of the derivative
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 uxErrFD = []; uyErrFD = []; vxErrFD = []; vyErrFD = []; % Trad diff errors
