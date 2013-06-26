@@ -1,4 +1,6 @@
 %% Testing the convergence of derivatives using divFree FD method
+clc
+close all
 
 k1 = 3; k2 = 7;  % control the amout of vortices on the testFunction
 
@@ -62,12 +64,12 @@ for n = nn
     % Numerical derivatives (inefficient code, will replace when we decide 
     % on the format of the interpolant):
     numUnknows = length(coeffs);
-    uxAtO = ux(0,0)*coeffs;
-    uyAtO = uy(0,0)*coeffs;
-    vxAtO = vx(0,0)*coeffs;
-    vyAtO = vy(0,0)*coeffs;
-    uAtO = t1(0,0)*coeffs;
-    vAtO = t2(0,0)*coeffs;
+    uxAtO = ux(0,0,coeffs);
+    uyAtO = uy(0,0,coeffs);
+    vxAtO = vx(0,0,coeffs);
+    vyAtO = vy(0,0,coeffs);
+    uAtO = t1(0,0,coeffs);
+    vAtO = t2(0,0,coeffs);
     % ---------------------------------------------------------------------
     
     % Measuring the error for divFree method -

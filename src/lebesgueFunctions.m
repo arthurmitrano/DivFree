@@ -134,3 +134,4 @@ mesh(XX,YY,lebesgueFunctionV);
 title(['Lebesgue Function V for (i,j) = (' num2str(i) ',' num2str(j) ...
        '), \Lambda_V = ' num2str(lebesgueConstV)])
 
+end
