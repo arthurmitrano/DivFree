@@ -23,6 +23,8 @@ function [A, Dx, Dy, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep)
 n = size(r,1); % number of interpolation points
 [F, G, dF, dG] = FandG(ep, rbf);
 
+%%
+% Click <FandG.html here> for more info on the |FandG| function.
 %% Creating divergence-free RBF interpolation matrix
 A11 = -F(r) - G(r) .* d2.^2; 
 A22 = -F(r) - G(r) .* d1.^2; 
@@ -44,9 +46,9 @@ A11 = d1 .* temp1;
 A22 = d1 .* ( temp2  - 2*G(r) );
 A12 = temp3 .* d1 + G(r) .* d2;
 % A21 = A12;
-H1 = reshape([A11(:) A12(:)]', 2*N, N)';
-H2 = reshape([A12(:) A22(:)]', 2*N, N)';
-Ax = reshape([H1 H2]', 2*N, 2*N);
+H1 = reshape([A11(:) A12(:)]', 2*n, n)';
+H2 = reshape([A12(:) A22(:)]', 2*n, n)';
+Ax = reshape([H1 H2]', 2*n, 2*n);
 
 Dx = Ax/A;  % Differentiate in respect to x
 
@@ -54,9 +56,9 @@ A11 = d2 .* ( temp1 - 2*G(r) );
 A22 = d2 .* temp2;
 A12 = temp3 .* d2 + G(r) .* d1;
 % A21 = A12;
-H1 = reshape([A11(:) A12(:)]', 2*N, N)';
-H2 = reshape([A12(:) A22(:)]', 2*N, N)';
-Ay = reshape([H1 H2]', 2*N, 2*N);
+H1 = reshape([A11(:) A12(:)]', 2*n, n)';
+H2 = reshape([A12(:) A22(:)]', 2*n, n)';
+Ay = reshape([H1 H2]', 2*n, 2*n);
 
 Dy = Ay/A;  % Differentiate in respect to y
 

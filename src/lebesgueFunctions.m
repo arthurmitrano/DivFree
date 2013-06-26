@@ -75,7 +75,7 @@ for p = [uIdx; vIdx+numPts^2]' % 1:2*numPts^2 minus some pts.
     U = L(:,1:numPts);
     V = L(:,numPts+1:2*numPts);
     L(p) = 0; % going back to zero matrix
-    coeffs(:,p) = M\[U(uIdx); V(vIdx)];
+    coeffs(:,p) = M\[U(uIdx); V(vIdx)];  % WHY DO I KEEP THOSE COEFFS
     [i,j] = ind2sub([numPts, numPts], rem(p-1,numPts^2)+1); 
                                    % p = 1, ..., numPts^2, 1, ..., numPts^2
     cardFunctionU = uInterp(XX,YY,coeffs(:,p));
@@ -83,17 +83,23 @@ for p = [uIdx; vIdx+numPts^2]' % 1:2*numPts^2 minus some pts.
     if display
         figure(1)
         set(gcf, 'Position', [100,100, 600*2, 600])
-        subplot(1,2,1)
+        h1 = subplot(1,2,1);
         mesh(XX,YY,cardFunctionU);
+        axis([xxRefined(1) xxRefined(end) xxRefined(1) xxRefined(end) ...
+              -.3 1])
         title(['Cardinal Function U for (i,j) = (' num2str(i) ',' ...
                num2str(j) ')'])
     
-        subplot(1,2,2)
+        h2 = subplot(1,2,2);
         mesh(XX,YY,cardFunctionV);
+        axis([xxRefined(1) xxRefined(end) xxRefined(1) xxRefined(end) ...
+              -.3 1])
         title(['Cardinal Function V for (i,j) = (' num2str(i) ',' ...
                num2str(j) ')'])
-    
+
+        set([h1 h2], 'clim', [-.3 1])
         snapnow
+        pause
     end
 
     lebesgueFunctionU = lebesgueFunctionU + abs(cardFunctionU);

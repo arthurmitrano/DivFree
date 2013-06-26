@@ -11,7 +11,7 @@ function t = RBFdivFreeInterp(coeffs, ePoints, dSites, F, G)
 % F, G    : functions used to create the kernel and evaluate the 
 %           interpolant (annonymous functions)
 
-r = DistanceMatrix(ePoints);
+r = DistanceMatrix(ePoints, dSites);
 d1 = DifferenceMatrix(ePoints(:,1), dSites(:,1));
 d2 = DifferenceMatrix(ePoints(:,2), dSites(:,2));
 
