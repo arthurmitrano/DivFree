@@ -51,7 +51,20 @@ numPts = interpPts.numPts;  % The sqrt of the total number of pts
 syms x y
 
 S = kron(x.^(0:N),y.^(0:N));
-S([1]) = [];                % Taking out the constant coefficient
+% Removing redundant terms ------------------------------------------------
+S(1) = [];                        % Taking out the constant coefficient
+if N == 5
+    S(end) = [];                  % Taking out degree 10
+    S(end - [5 0]) = [];          % Taking out degree 9
+    S(end - [9 4 0]) = [];        % Taking out degree 8
+    S(end - [12 7 3 0]) = [];     % Taking out degree 7
+    %S(end - [14 9 5 2 0]) = [];  % Taking out degree 6 <== RANK DEFICIENT
+    S(end - [5 2 0]) = [];        % Taking out some 6th degree terms
+    S(end) = [];                  % Taking a 5th degree term
+    S(end - [17 1]) = [];         % Taking out some 4th degree terms
+    S(end - 16) = [];             % Taking out a 3rd degree term
+end
+% -------------------------------------------------------------------------
 Sx = diff(S, x); v = -Sx;
 Sy = diff(S, y); u = +Sy;   % div(rot( (0,0,S) )) = 0
 coeffs = sym('c', [length(u), 1]);
