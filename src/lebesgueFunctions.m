@@ -128,16 +128,17 @@ end
 lebesgueConstU = max(max(lebesgueFunctionU));
 lebesgueConstV = max(max(lebesgueFunctionV));
 
-figure(2)
-set(gcf, 'Position', [100,100, 600*2, 600])
-subplot(1,2,1)
-mesh(XX,YY,lebesgueFunctionU);
-title(['Lebesgue Function U for (i,j) = (' num2str(i) ',' num2str(j) ...
-       '), \Lambda_U = ' num2str(lebesgueConstU)])
-
-subplot(1,2,2)
-mesh(XX,YY,lebesgueFunctionV);
-title(['Lebesgue Function V for (i,j) = (' num2str(i) ',' num2str(j) ...
-       '), \Lambda_V = ' num2str(lebesgueConstV)])
-
+if display
+    figure(2)
+    set(gcf, 'Position', [100,100, 600*2, 600])
+    subplot(1,2,1)
+    mesh(XX,YY,lebesgueFunctionU);
+    title(['Lebesgue Function U for (i,j) = (' num2str(i) ',' num2str(j) ...
+        '), \Lambda_U = ' num2str(lebesgueConstU)])
+    
+    subplot(1,2,2)
+    mesh(XX,YY,lebesgueFunctionV);
+    title(['Lebesgue Function V for (i,j) = (' num2str(i) ',' num2str(j) ...
+        '), \Lambda_V = ' num2str(lebesgueConstV)])
+end
 end

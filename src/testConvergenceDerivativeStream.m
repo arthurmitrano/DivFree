@@ -12,7 +12,7 @@ k = 1;           % Order of the derivative
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 uxErrFD = []; uyErrFD = []; vxErrFD = []; vyErrFD = []; % Trad diff errors
 
-nn = 11:20:11; % The code only works for n odd, will get non-integer index
+nn = 11:20:200; % The code only works for n odd, will get non-integer index
                 % otherwise
 for n = nn
     tic
@@ -93,5 +93,3 @@ loglog(nn,vxErr,'r.-', nn,vyErr,'b.-', nn,nn.^-2,'r--', nn,nn.^-4,'b--')
 legend('vxErr','vyErr','N^{-2}','N^{-4}', 'Location','Best')
 title('Error on v derivatives')
 xlabel('N'), ylabel('Error')
-
-rank(M)
