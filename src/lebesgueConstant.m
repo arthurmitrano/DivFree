@@ -43,7 +43,7 @@ constPoly = zeros(length(totalPoints),1);
 
 i = 1;
 for n = totalPoints
-    constPoly(i) = lebesgueFunctions(n,n+2);
+    constPoly(i) = lebesgueFunctions(n,n+4);
     i = i + 1;
 end
 
@@ -103,7 +103,7 @@ alphasPoly = zeros(length(totalPoints),1);
 
 i = 1;
 for n = totalPoints
-    [a, L] = fminbnd(@(alpha) lebesgueFunctions(n,n+2,n,false,alpha), 0,1);
+    [a, L] = fminbnd(@(alpha) lebesgueFunctions(n,n+4,n,false,alpha), 0,1);
     alphasPoly(i) = a;
     minConstPoly(i) = L;
     i = i + 1;
