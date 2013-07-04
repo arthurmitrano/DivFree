@@ -10,8 +10,7 @@
 % FD_divFreeMatrixStream.html>.
 
 %%
-function [lebesgueConstU, lebesgueConstV] = ...
-                                      lebesgueFunctions(n,N,numPts,display)
+function lebesgueConst = lebesgueFunctions(n,N,numPts,display,alpha)
 % Calculates Lebesgue function and it's constant. If numPts is not
 % provided, numPts = n. If numPts present then display = true else false.
 %
@@ -19,6 +18,7 @@ function [lebesgueConstU, lebesgueConstV] = ...
 % N       : Degree of the bivariate interpolation polynomial
 % numPts  : The main stecil will have numPts^2 points (optional)
 % display : Display the cardinal function plots (optinal)
+% alpha   : Kosloff & Tal-Ezer parameter (default = 1)
 %
 % NOTE: n and numPts must be odd numbers.
 
@@ -30,10 +30,13 @@ if (nargin <= 2)
 else
     local = (n ~= numPts);  % The main stecil will have numPts^2 points
 end
-
 if (nargin == 3)
     display = true;
 end
+if (nargin <= 4)
+    alpha = 1;
+end
+
 %% Generating 2d-grid of n^2 pts equally-spaced
 xx = linspace(-1,1,n);
 h = abs(xx(2) - xx(1));
@@ -61,7 +64,7 @@ end
 interpPts = struct('u', uIdx,'v', vIdx, 'numPts',numPts);
 
 %% Calculating the cardinal functions
-[M, uInterp, vInterp] = FD_DivFreeMatrixStream(h,N,interpPts);
+[M, uInterp, vInterp] = FD_DivFreeMatrixStream(h,N,interpPts,alpha);
 
 L = zeros(numPts,2*numPts);  % used to construct delta function
 coeffs = zeros(size(M,2), length(uIdx) + length(vIdx));
@@ -127,18 +130,19 @@ end
 %% Plotting the Lebesgue functions and the Lebesgue constant
 lebesgueConstU = max(max(lebesgueFunctionU));
 lebesgueConstV = max(max(lebesgueFunctionV));
+lebesgueConst = max([lebesgueConstU, lebesgueConstV]);
 
 if display
     figure(2)
     set(gcf, 'Position', [100,100, 600*2, 600])
     subplot(1,2,1)
     mesh(XX,YY,lebesgueFunctionU);
-    title(['Lebesgue Function U for (i,j) = (' num2str(i) ',' num2str(j) ...
+    title(['Lebesgue Function U for (i,j) = (' num2str(i) ',' num2str(j)...
         '), \Lambda_U = ' num2str(lebesgueConstU)])
     
     subplot(1,2,2)
     mesh(XX,YY,lebesgueFunctionV);
-    title(['Lebesgue Function V for (i,j) = (' num2str(i) ',' num2str(j) ...
+    title(['Lebesgue Function V for (i,j) = (' num2str(i) ',' num2str(j)...
         '), \Lambda_V = ' num2str(lebesgueConstV)])
 end
 end

@@ -6,8 +6,7 @@
 % of _Narcowich_, _Ward_ and _Wright_.
 
 %%
-function [lebesgueConstU, lebesgueConstV] = ...
-                                  lebesgueFunctionsRBF(n, display, ep, rbf)
+function lebesgueConst = lebesgueFunctionsRBF(n, display, ep, rbf, alpha)
 % Calculates Lebesgue function and its constant. The function uses an
 % equispaced grid in x- and y-direction.
 %
@@ -16,6 +15,7 @@ function [lebesgueConstU, lebesgueConstV] = ...
 % ep      : Shape parameter (optional, default = 2)
 % rbf     : Radial basis function (optional,
 %                                  default = @(ep,r) exp(-(ep*r).^2) )
+% alpha   : Parameter for the Kosloff & Tal-Ezer mapping (default = 1);
 
 %% Setting up the function
 if nargin == 1
@@ -27,9 +27,13 @@ end
 if nargin <= 3
     rbf = @ (ep,r) exp(-(ep*r).^2);
 end
+if nargin <= 4
+    alpha = 1;
+end
 
 %% Generating the 2d grid of n^2 equispaced nodes
-x = linspace(-1,1,n);
+xCheb = sort(cos(pi*(0:n-1)/(n-1)));
+x = asin(alpha*xCheb)/asin(alpha);
 xx = linspace(-1,1,7*n);
 
 [X,Y] = meshgrid(x);
@@ -67,21 +71,27 @@ for p = 1:2*n^2  % all interpolation points
     [i,j] = ind2sub([n, n], rem(p-1,n^2) + 1); 
     if display
         figure(1)
-        set(gcf, 'Position', [100,100, 600*2, 600])
-        h1 = subplot(1,2,1);
-        mesh(XX,YY,cardFunctionU)
-        axis([-1 1 -1 1 -.5 1])
+%         set(gcf, 'Position', [100,100, 600*2, 600])
+%         h1 = subplot(1,2,1);
+%         mesh(XX,YY,cardFunctionU)
+        normcard = sqrt(cardFunctionU.^2+cardFunctionV.^2);
+        quiver(XX,YY,cardFunctionU,cardFunctionV,max(max(normcard)))
+        axis tight
+        hold on, plot(X,Y,'.k','markersize',20)
+        plot(X(i,j),Y(i,j),'or','markersize',20), hold off
+%         axis([-1 1 -1 1 -.5 1])
         title(['Cardinal Function U for (i,j) = (' num2str(i) ',' ...
                num2str(j) ')'])
     
-        h2 = subplot(1,2,2);
-        mesh(XX,YY,cardFunctionV)
-        axis([-1 1 -1 1 -.5 1])
-        title(['Cardinal Function V for (i,j) = (' num2str(i) ',' ...
-               num2str(j) ')'])
-
-        set([h1 h2], 'clim', [-.5 1])
+%         h2 = subplot(1,2,2);
+%         mesh(XX,YY,cardFunctionV)
+%         axis([-1 1 -1 1 -.5 1])
+%         title(['Cardinal Function V for (i,j) = (' num2str(i) ',' ...
+%                num2str(j) ')'])
+%
+%         set([h1 h2], 'clim', [-.5 1])
         snapnow
+        pause(1)
     end
 
     lebesgueFunctionU = lebesgueFunctionU + abs(cardFunctionU);
@@ -97,13 +107,16 @@ end
 %% Plotting the Lebesgue functions and the Lebesgue constant
 lebesgueConstU = max(max(lebesgueFunctionU));
 lebesgueConstV = max(max(lebesgueFunctionV));
+lebesgueConst = max([lebesgueConstU, lebesgueConstV]);
 
-figure(2)
-set(gcf, 'Position', [100,100, 600*2, 600])
-subplot(1,2,1)
-mesh(XX,YY,lebesgueFunctionU);
-title(['Lebesgue Function U, \Lambda_U = ', num2str(lebesgueConstU)])
+if display
+    figure(2)
+    set(gcf, 'Position', [100,100, 600*2, 600])
+    subplot(1,2,1)
+    mesh(XX,YY,lebesgueFunctionU);
+    title(['Lebesgue Function U, \Lambda_U = ', num2str(lebesgueConstU)])
 
-subplot(1,2,2)
-mesh(XX,YY,lebesgueFunctionV);
-title(['Lebesgue Function V, \Lambda_V = ', num2str(lebesgueConstV)])
+    subplot(1,2,2)
+    mesh(XX,YY,lebesgueFunctionV);
+    title(['Lebesgue Function V, \Lambda_V = ', num2str(lebesgueConstV)])
+end

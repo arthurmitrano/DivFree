@@ -18,7 +18,7 @@
 
 %%
 function [M, u, v, ux, uy, vx, vy] = ...
-         FD_DivFreeMatrixStream(h, N, interpPts, k)
+         FD_DivFreeMatrixStream(h, N, interpPts, alpha)
 % Generate the interpolation matrix to get the coeffs of the interpolating
 % polynomial on a stencil with equally spaced points in both directions 
 % with numPts^2 points.
@@ -27,7 +27,7 @@ function [M, u, v, ux, uy, vx, vy] = ...
 % h          : dx and dy of the stencil
 % N          : degree of the bivariate polynomial
 % interpPts  : struct with the interpolation points indexes
-% k          : order of the derivative to be taken (default = 1)
+% alpha      : Kosloff & Tal-Ezer parameter
 %
 % OUTPUT:
 % M              : matrix(h) to be inverted to find the desired polynomial
@@ -40,7 +40,7 @@ function [M, u, v, ux, uy, vx, vy] = ...
 
 %% Setting up the function
 if (nargin < 4)
-    k = 1;
+    alpha = 1;
 end
 numPts = interpPts.numPts;  % The sqrt of the total number of pts
 
@@ -69,10 +69,10 @@ Sx = diff(S, x); v = -Sx;
 Sy = diff(S, y); u = +Sy;   % div(rot( (0,0,S) )) = 0
 coeffs = sym('c', [length(u), 1]);
 
-ux = diff(u, x, k); % ux and vy are used to impose div-free condition, and, 
-vy = diff(v, y, k); % just like uy and vx, are returned as numerical 
-uy = diff(u, y, k); % derivatives.
-vx = diff(v, x, k);
+ux = diff(u, x); % ux and vy are used to impose div-free condition, and,
+vy = diff(v, y); % just like uy and vx, are returned as numerical
+uy = diff(u, y); % derivatives.
+vx = diff(v, x);
 
 ux = matlabFunction(ux*coeffs,'vars',{x y coeffs});
 vy = matlabFunction(vy*coeffs,'vars',{x y coeffs});
@@ -89,7 +89,8 @@ v = matlabFunction(v,'vars',[x y]);
 %
 % The interpolations points are denoted by $(X_u,Y_u)$ for the component
 % $u$ and $(X_v,Y_v)$ for the component $v$.
-[X, Y] = meshgrid( h*(-floor(numPts/2):1:floor(numPts/2)) );
+xCheb = sort(cos(pi*(0:numPts-1)/(numPts-1)));
+[X, Y] = meshgrid( h*asin(alpha*xCheb)/asin(alpha) );
 Xu = X(interpPts.u); Yu = Y(interpPts.u); 
 Xv = X(interpPts.v); Yv = Y(interpPts.v);
 
