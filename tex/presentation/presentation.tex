@@ -9,7 +9,7 @@
 
 \mode<presentation>
 {
-  \usetheme{Berlin}
+  \usetheme{Berkeley}
   % or ... Warsaw, Antibes, Bergen, Berkeley, Berlin
 
   \setbeamercovered{transparent}
@@ -185,7 +185,7 @@ Approximations}
 
 \begin{frame}{Effect of the shape parameter for $\varepsilon$}
   \begin{center}
-    \includegraphics[width=.55\linewidth]{../img/understandingShapeParameter}
+    \includegraphics[width=\linewidth]{../img/understandingShapeParameter}\\
     $f(x) = e^x + 0.1\sin(10x)$.
   \end{center}
 
@@ -224,7 +224,8 @@ Approximations}
 
 \begin{frame}{Kernel for the 2D case}
   \begin{equation*}
-    -F(r)I - G(r)(\mathbf{x} - \mathbf{y})(\mathbf{x} - \mathbf{y})^T
+    \Psi(\mathbf{x},\mathbf{y}) = -F(r)I - G(r)(\mathbf{x} - 
+    \mathbf{y})(\mathbf{x} - \mathbf{y})^T
   \end{equation*}
 
   \begin{equation*}
@@ -240,9 +241,9 @@ Approximations}
     \item To calculate the $\mathbf{s}_k$ vectors, we evaluate the interpolant
       on the nodes $\mathbf{x}_j$.
       \begin{gather*}
-        \mathbf{t_j} = (u_j,v_j), \quad \mathbf{s}_k = (s_k^u,s_k^u)\\
+        \mathbf{t_j} = (u_j,v_j), \quad \mathbf{s}_k = (s_k^u,s_k^v)\\
         \mathbf{d} = A\mathbf{c},\\
-        \mathbf{d} = [u_1^ v_1 \cdots u_N v_N]^{T}, \quad
+        \mathbf{d} = [u_1 v_1 \cdots u_N v_N]^{T}, \quad
         \mathbf{c} = [s_1^u s_1^v \cdots s_N^u s_N^v]^{T}
       \end{gather*}
 
@@ -251,6 +252,7 @@ Approximations}
 
     \item \emph{Narcowich, Ward and Wright} prove that $A$ is positive-definite,
       therefore invertible.
+    \end{itemize}
 \end{frame}
 % From the interpolation conditions we can extract (after some organization) a
 % linear system of size $2N\times 2N$. We construct the interpolation matrix
@@ -301,10 +303,10 @@ Approximations}
     \begin{center}
       \begin{tabular}{l||l|l}
         \multicolumn{1}{c||}{$\sqrt{N}$} & 
-	\multicolumn{1}{c}{$Cond(A_{divFree})$} & 
+	\multicolumn{1}{c|}{$Cond(A_{divFree})$} & 
 	\multicolumn{1}{c}{$Cond(A_{trad})$} \\
         \hline \hline
-        $2$ & $1.35\times 10^{0}$ & $1.08\times 10^{0}$ \\
+        %$2$ & $1.35\times 10^{0}$ & $1.08\times 10^{0}$ \\
         $3$ & $3.82\times 10^{1}$ & $9.79\times 10^{0}$ \\
         $4$ & $7.36\times 10^{3}$ & $4.41\times 10^{2}$ \\
         $5$ & $4.49\times 10^{6}$ & $4.94\times 10^{4}$ \\
@@ -316,8 +318,8 @@ Approximations}
         $11$ & $2.33\times 10^{19}$ & $5.19\times 10^{17}$ \\
         $12$ & $5.04\times 10^{18}$ & $1.81\times 10^{19}$ \\
         $13$ & $1.94\times 10^{20}$ & $5.43\times 10^{18}$ \\
-        $14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
-        $15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
+        %$14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
+        %$15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
     \end{tabular}
     \end{center}
     \caption{Condition number of the interpolation matrices of the 
@@ -349,7 +351,7 @@ Approximations}
 
 \begin{frame}{Higher accuracy on some derivatives}
   \begin{center}
-    \includegraphics[width=0.55\linewidth]{../img/errorDecayFDRBFdivFree}
+   \includegraphics[width=0.85\linewidth]{../img/errorDecayFDRBFdivFree}
   \end{center}
   
   \begin{itemize}
@@ -375,7 +377,7 @@ Approximations}
     \item The interpolation condition leads to a linear system that might have
       many solutions or no one.
 
-    \item Use the least squares solution
+    \item Use the least squares solution.
   \end{itemize}
 \end{frame}
 % We can always try to generate divergence-free interpolants trying to
@@ -391,17 +393,14 @@ Approximations}
       \includegraphics[width=0.5\linewidth]{../img/errorDecayFDdivFree}
       \includegraphics[width=0.5\linewidth]{../img/errorDecayFDdivFreeSmallN}
     \end{center}
-    \caption{$N=10,\ldots,100$. The right picture uses a polynomial of degree 
-      $2$ and the left picture degree $3$. $U_{x}$ and $U_{y}$, denote the 
-      approximation of the partial derivatives of the first component of 
-      $\mathbf{f}$.}
+    \caption{Left: degree $3$, right: degree $2$.}
   \end{figure}
   
   \begin{itemize}
     \item The degrees of freedom on the stream function let we get better
       results for $u_x$ and $v_y$.
       
-    \item If we use $N$ not big enough we do not achieve a faster rate of
+    \item If $N$ is not big enough we do not achieve a faster rate of
       convergence for the derivatives.
   \end{itemize}
 \end{frame}
@@ -416,7 +415,7 @@ Approximations}
 \section{Lebesgue constants}
 \begin{frame}{Lebesgue constants}
   \begin{center}
-    \includegraphics[width=0.55\linewidth]{../img/lebesgueConstGrowth}
+    %\includegraphics[width=0.55\linewidth]{../img/lebesgueConstGrowth}
   \end{center}
 \end{frame}
 % For all cases the Lebesgue constant grows with the amount of points utilized,
@@ -427,42 +426,43 @@ Approximations}
 
 \begin{frame}{Using different set of nodes}
   \begin{itemize}
-    \item Kosloff & Tal-Ezer mapping:
+    \item Kosloff \& Tal-Ezer mapping:
       \begin{equation*}
         x_j^{kte(\alpha)} := \frac{\arcsin(\alpha x_j^{cheb})}{\arcsin(\alpha)},
-	\quad j = 1,\ldots, \qquad x_j^{cheb} = \cos{\frac{\pi(j-1)}{N-1}}.
+	\quad j = 1,\ldots, \quad x_j^{cheb} = \cos{\frac{\pi(j-1)}{N-1}}.
       \end{equation*}
   \end{itemize}
 
-  \begin{table}[hptb]
-    \begin{center}
-      \begin{tabular}{l||l|l}
-        \multicolumn{1}{c||}{$\sqrt{N}$} & 
-	\multicolumn{1}{c}{$Cond(A_{divFree})$} & 
-	\multicolumn{1}{c}{$Cond(A_{trad})$} \\
-        \hline \hline
-        $2$ & $1.35\times 10^{0}$ & $1.08\times 10^{0}$ \\
-        $3$ & $3.82\times 10^{1}$ & $9.79\times 10^{0}$ \\
-        $4$ & $7.36\times 10^{3}$ & $4.41\times 10^{2}$ \\
-        $5$ & $4.49\times 10^{6}$ & $4.94\times 10^{4}$ \\
-        $6$ & $4.87\times 10^{9}$ & $1.06\times 10^{7}$ \\
-        $7$ & $8.11\times 10^{12}$ & $3.72\times 10^{9}$ \\
-        $8$ & $1.76\times 10^{16}$ & $1.91\times 10^{12}$ \\
-        $9$ & $1.93\times 10^{17}$ & $1.40\times 10^{15}$ \\
-        $10$ & $2.52\times 10^{18}$ & $1.23\times 10^{17}$ \\
-        $11$ & $2.33\times 10^{19}$ & $5.19\times 10^{17}$ \\
-        $12$ & $5.04\times 10^{18}$ & $1.81\times 10^{19}$ \\
-        $13$ & $1.94\times 10^{20}$ & $5.43\times 10^{18}$ \\
-        $14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
-        $15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
-    \end{tabular}
-    \end{center}
-    \caption{Condition number of the interpolation matrices of the 
-    divergence-free and traditional methods. $\varepsilon = 2$}
-  \end{table}
+  %\begin{table}[hptb]
+  %  \begin{center}
+  %    \begin{tabular}{l||l|l}
+  %      \multicolumn{1}{c||}{$\sqrt{N}$} & 
+	%\multicolumn{1}{c}{$Cond(A_{divFree})$} & 
+	%\multicolumn{1}{c}{$Cond(A_{trad})$} \\
+        %\hline \hline
+        %$2$ & $1.35\times 10^{0}$ & $1.08\times 10^{0}$ \\
+        %$3$ & $3.82\times 10^{1}$ & $9.79\times 10^{0}$ \\
+        %$4$ & $7.36\times 10^{3}$ & $4.41\times 10^{2}$ \\
+        %$5$ & $4.49\times 10^{6}$ & $4.94\times 10^{4}$ \\
+        %$6$ & $4.87\times 10^{9}$ & $1.06\times 10^{7}$ \\
+        %$7$ & $8.11\times 10^{12}$ & $3.72\times 10^{9}$ \\
+        %$8$ & $1.76\times 10^{16}$ & $1.91\times 10^{12}$ \\
+        %$9$ & $1.93\times 10^{17}$ & $1.40\times 10^{15}$ \\
+        %$10$ & $2.52\times 10^{18}$ & $1.23\times 10^{17}$ \\
+        %$11$ & $2.33\times 10^{19}$ & $5.19\times 10^{17}$ \\
+        %$12$ & $5.04\times 10^{18}$ & $1.81\times 10^{19}$ \\
+        %$13$ & $1.94\times 10^{20}$ & $5.43\times 10^{18}$ \\
+        %$14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
+        %$15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
+    %\end{tabular}
+    %\end{center}
+    %\caption{Condition number of the interpolation matrices of the 
+    %divergence-free and traditional methods. $\varepsilon = 2$}
+  %\end{table}
 \end{frame}
 % FIX TABLE (DO IT ACTUALLY) AND WRITE COMMENTS!
 
+\section{Conclusion and future work}
 \begin{frame}{Conclusion and future work}
   \begin{itemize}
     \item Conclusion
