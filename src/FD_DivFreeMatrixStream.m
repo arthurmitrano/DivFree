@@ -39,7 +39,7 @@ function [M, u, v, ux, uy, vx, vy] = ...
 % decide on the final format of the interpolant.
 
 %% Setting up the function
-if (nargin < 4)
+if (nargin <= 3)
     alpha = 1;
 end
 numPts = interpPts.numPts;  % The sqrt of the total number of pts
@@ -89,8 +89,13 @@ v = matlabFunction(v,'vars',[x y]);
 %
 % The interpolations points are denoted by $(X_u,Y_u)$ for the component
 % $u$ and $(X_v,Y_v)$ for the component $v$.
-xCheb = sort(cos(pi*(0:numPts-1)/(numPts-1)));
-[X, Y] = meshgrid( h*asin(alpha*xCheb)/asin(alpha) );
+if alpha == 1
+    [X, Y] = meshgrid( h*(-floor(numPts/2):1:floor(numPts/2)) );
+else
+    xCheb = sort(cos(pi*(0:numPts-1)/(numPts-1)));
+    [X, Y] = meshgrid( asin(alpha*xCheb)/asin(alpha) );
+end
+
 Xu = X(interpPts.u); Yu = Y(interpPts.u); 
 Xv = X(interpPts.v); Yv = Y(interpPts.v);
 
