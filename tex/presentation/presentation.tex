@@ -1,0 +1,483 @@
+\documentclass{beamer}
+
+% This file is a solution template for:
+
+% - Talk at a conference/colloquium.
+% - Talk length is about 20min.
+% - Style is ornate.
+
+
+\mode<presentation>
+{
+  \usetheme{Berlin}
+  % or ... Warsaw, Antibes, Bergen, Berkeley, Berlin
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+
+\usepackage{graphics}
+
+\title[i]{A Numerical Study of the Accuracy of Divergence-Free Kernel 
+Approximations}
+\subtitle{}
+
+\author[Arthur Mitrano]
+{Arthur Mitrano}
+% - Give the names in the same order as the appear in the paper.
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+\institute[Arizona State University] % (optional, but mostly needed)
+{
+  School of Mathematical and Statistical Sciences\\
+  Arizona State University}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[AN13] % (optional, should be abbreviation of conference name)
+{April, 2013}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+  % You might wish to add the option [pausesections]
+\end{frame}
+
+
+% Structuring a talk is a difficult task and the following structure
+% may not be suitable. Here are some rules that apply for this
+% solution: 
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+% - A conference audience is likely to know very little of what you
+%   are going to talk about. So *simplify*!
+% - In a 20min talk, getting the main ideas across is hard
+%   enough. Leave out details, even if it means being less precise than
+%   you think necessary.
+% - If you omit details that are vital to the proof/implementation,
+%   just say so once. Everybody will be happy with that.
+
+\section{Introduction}
+\begin{frame}{Why use divergence-free schemes}
+  \begin{itemize}
+    \item Assure that the divergence of a vector field is zero.
+
+    \item Useful in simulation of incompressible fluid flows.
+
+    \item Enforcement of zero divergence is necessary for numerical stability.
+
+    \item Divergence-free interpolants based on polynomials and radial basis
+      functions.
+  \end{itemize}	
+\end{frame}
+% The idea of this slide is give a brief reason of why is important to pay
+% attention to divergence-free methods. It might be better to include some
+% examples on the slides to not have to memorize everything.
+
+\begin{frame}{Test problem}
+  \begin{itemize}  
+    \item Divergence-free vector field:
+      \begin{equation*}
+	\mathbf{f}(x,y) = \left( \frac{\sin(k_1 x)\cos(k_2 y)}{k_1}, 
+	-\frac{\cos(k_1 x)\sin(k_2 y)}{k_2}\right)
+      \end{equation*}
+  \end{itemize}
+
+  \begin{center}
+    \includegraphics[width=.55\linewidth]{../img/vectorFieldAndInterpolant}
+  \end{center}
+\end{frame}
+% In this slide we explain what we are doing numerically, that is, explain which
+% test problem we are using and what we are investigating:
+% 1) Looking for a RBF or a polynomial divergence-free interpolants
+% 2) Calculation the numerical precision of the derivatives of those
+%    interpolants.
+% Maybe is better to put a extra slide saying those two topics instead just talk
+% about them.
+
+\section{RBFs interpolants}
+\subsection{Basic of RBF interpolation}
+\begin{frame}{Basic of RBF interpolation}
+  \begin{equation*}
+    s_{f,N}(x) = \sum_{k=1}^{N} c_{k}\varphi(\varepsilon ||x - x_{k}||)
+  \end{equation*}
+
+  \begin{itemize}
+    \item Coefficients $c_k$ are calculated such that $s_{f,N}(x_k) = f(x_k)$,
+      for $k = 1,\ldots,N$.
+
+    \item $\varepsilon$ is the shape parameter.
+
+    \item Examples of basic functions:
+      \begin{align*}
+        \varphi(r) &= \exp(-r^{2}) &\text{Gaussians} \\
+        \varphi(r) &= 1/(1 + r^{2}) &\text{inverse quadrics} \\
+        \varphi(r) &= \sqrt{1 + r^{2}} &\text{multiquadrics}
+      \end{align*}
+  \end{itemize}
+\end{frame}
+% Here is important to talk about the linear system that we will fall, how the
+% shape parameter $\varepsilon$ changes the interpolant and mention some
+% of basic functions. Note that we going to talk more about those on the coming
+% slides, so no need to get in details here.
+
+\begin{frame}{Some properties}
+  \begin{itemize}
+    \item Enforcing the interpolation conditions lead to the linear system 
+      $A\mathbf{c} = \mathbf{f}$.
+      
+    \item The interpolation matrix $A$ is positive-definite for the right choice
+      of basic function $\varphi$.
+
+    \item $\varepsilon$ has a key role in the accuracy of the approximation and
+      the conditioning of $A$.
+  \end{itemize}
+\end{frame}
+% Here we must emphasize that the interpolation matrix is invertible for
+% positive-definite functions $\varphi$, however, the depending of the shape
+% parameter chosen the condition number of $A$ can be extremely high.
+
+\begin{frame}{Effect of the shape parameter for $\varepsilon$}
+  \begin{center}
+    \includegraphics[width=.55\linewidth]{../img/understandingShapeParameter}
+    $f(x) = e^x + 0.1\sin(10x)$.
+  \end{center}
+
+  \begin{itemize}
+    \item Large value of $\varepsilon$ leads to a localized interpolant, and a
+      small value gives a global approximation.
+  \end{itemize}
+\end{frame}
+% Here we illustrate the effect of the shape parameter $\varepsiolon$. It is
+% important to remark that $\varepsilon \rightarrow 0$ the RBF becomes flatter
+% giving a global approximation, and if $\varepsilon \rightarrow \infty$ the RBF
+% becomes a spike and the interpolant becomes localized on the data sites.
+
+\subsection{Divergence-free RBF interpolant}
+\begin{frame}{Divergence-free RBF interpolant}
+  \begin{itemize}
+    \item $\mathbf{t}_1,\ldots,\mathbf{t}_N$ are samples of a vector field at
+      the points $\mathbf{x}_1,\ldots,\mathbf{x}_N$.
+      
+    \item The divergence-free interpolant is given by
+      \begin{equation*}
+	\mathbf{t}(\mathbf{x}) = \sum_{k = 1}^{N}
+	{\Psi(\mathbf{x},\mathbf{x}_k)\mathbf{s}_k}
+      \end{equation*}
+      where $\Psi(\mathbf{x},\mathbf{y}) = X_\mathbf{n_x}
+      (-\nabla\nabla^T\psi(\mathbf{x} - \mathbf{y}))X_{\mathbf{n_y}}^T$ with
+      $X_\mathbf{a}\mathbf{b} = \mathbf{a}\times\mathbf{b}$. \emph{Reference:
+	``Divergence-free RBFs on surfaces''}.
+  \end{itemize}
+\end{frame}
+% The objective here is to introduce the divergence-free RBF interpolant
+% mentioning that it works for surfaces on $\mathbb{R}^3$ and that $\varphi$ is
+% chosen to be a positive-definite RBF, which is going to lead to non-singular
+% system of linear equations. Note also that the columns of the kernel are
+% divergence-free.
+
+\begin{frame}{Kernel for the 2D case}
+  \begin{equation*}
+    -F(r)I - G(r)(\mathbf{x} - \mathbf{y})(\mathbf{x} - \mathbf{y})^T
+  \end{equation*}
+
+  \begin{equation*}
+    F(r) = \frac{1}{r}\phi'(r), \quad G(r) = 
+    \frac{1}{r}\left(\frac{1}{r}\phi'(r)\right)' = \frac{1}{r}F'(r)
+  \end{equation*}
+\end{frame}
+% This slide is just to show the kernel for two dimensions, maybe is better to
+% put together with the previous slide.
+
+\begin{frame}{New linear system}
+  \begin{itemize}
+    \item To calculate the $\mathbf{s}_k$ vectors, we evaluate the interpolant
+      on the nodes $\mathbf{x}_j$.
+      \begin{gather*}
+        \mathbf{t_j} = (u_j,v_j), \quad \mathbf{s}_k = (s_k^u,s_k^u)\\
+        \mathbf{d} = A\mathbf{c},\\
+        \mathbf{d} = [u_1^ v_1 \cdots u_N v_N]^{T}, \quad
+        \mathbf{c} = [s_1^u s_1^v \cdots s_N^u s_N^v]^{T}
+      \end{gather*}
+
+    \item $A$ is a $2N\times 2N$ matrix composed of blocks $\Psi(\mathbf{x}_j,
+      \mathbf{x}_k)$.
+
+    \item \emph{Narcowich, Ward and Wright} prove that $A$ is positive-definite,
+      therefore invertible.
+\end{frame}
+% From the interpolation conditions we can extract (after some organization) a
+% linear system of size $2N\times 2N$. We construct the interpolation matrix
+% using the blocks generated by the kernel when evaluate at the data sites.
+% To follow the structure of $A$, we rewrite the vectors of $\mathbf{t}_j$ and
+% $\mathbf{s}_k$ as shown on the equations.
+
+\begin{frame}{Differentiation}
+  \begin{itemize}
+    \item Taking the derivative of the divergence-free interpolant and
+      evaluating at the data sites:
+      \begin{gather*}
+	\mathbf{d}_x = A_x\mathbf{c} \quad \rightarrow \quad \mathbf{d}_x =
+	A_x A^{-1}\mathbf{d} \\
+	\mathbf{d}_x = [u_x(\mathbf{x}_1) v_x(\mathbf{x}_1) \cdots 
+	u_x(\mathbf{x}_N) v_x(\mathbf{x}_N)]^T
+      \end{gather*}
+
+    \item $A_x$ is $2N\times 2N$ matrix with $2x2$ block entries:
+      \begin{equation*}
+        (A_x)_{ik} = \frac{\partial \Psi}{\partial x}
+	(\mathbf{x}_i,\mathbf{x}_k), \quad i,k \in \left\{1,\ldots,N\right\}.
+      \end{equation*}
+  \end{itemize}
+\end{frame}
+% On this slide we need to mention that when we want to differentiate the RBF
+% interpolant (divergence-free or not) we can reuse the coefficients already
+% calculated, i.e., we do not need to invert another matrix.
+
+\begin{frame}{Error decay of divergence-free RBF interpolant derivatives}
+  \begin{center}
+    %\includegraphics[width=0.55\linewidth]{../img/decayRBFderivatives}
+    $\varepsilon = 2$
+  \end{center}
+\end{frame}
+% This plot is to show de decay of the derivatives of the first component of the
+% divergence-free RBF interpolant. What we should remark here is that we have
+% spectral convergence, till we get to a plateau due to the ill conditioning of
+% the interpolation matrix. 
+% I MIGHT CHANGE THIS SLIDE TO THE ERROR DECAY OF INTERPOLATION, INSTEAD OF
+% DERIVATIVES. THE REASON FOR THAT IS IF THE INTERPOLATION MATRIX HAS A LARGE
+% CONDITION NUMBER, THERE IS NO REASON TO HOPE THE DIFFERENTIATION MATRIX
+% (BASED ON A) WILL PERFORM WELL.
+
+\subsection{Condition number of A}
+\begin{frame}{Analizing the spectral coefficients}
+  \begin{table}[hptb]
+    \begin{center}
+      \begin{tabular}{l||l|l}
+        \multicolumn{1}{c||}{$\sqrt{N}$} & 
+	\multicolumn{1}{c}{$Cond(A_{divFree})$} & 
+	\multicolumn{1}{c}{$Cond(A_{trad})$} \\
+        \hline \hline
+        $2$ & $1.35\times 10^{0}$ & $1.08\times 10^{0}$ \\
+        $3$ & $3.82\times 10^{1}$ & $9.79\times 10^{0}$ \\
+        $4$ & $7.36\times 10^{3}$ & $4.41\times 10^{2}$ \\
+        $5$ & $4.49\times 10^{6}$ & $4.94\times 10^{4}$ \\
+        $6$ & $4.87\times 10^{9}$ & $1.06\times 10^{7}$ \\
+        $7$ & $8.11\times 10^{12}$ & $3.72\times 10^{9}$ \\
+        $8$ & $1.76\times 10^{16}$ & $1.91\times 10^{12}$ \\
+        $9$ & $1.93\times 10^{17}$ & $1.40\times 10^{15}$ \\
+        $10$ & $2.52\times 10^{18}$ & $1.23\times 10^{17}$ \\
+        $11$ & $2.33\times 10^{19}$ & $5.19\times 10^{17}$ \\
+        $12$ & $5.04\times 10^{18}$ & $1.81\times 10^{19}$ \\
+        $13$ & $1.94\times 10^{20}$ & $5.43\times 10^{18}$ \\
+        $14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
+        $15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
+    \end{tabular}
+    \end{center}
+    \caption{Condition number of the interpolation matrices of the 
+    divergence-free and traditional methods. $\varepsilon = 2$}
+  \end{table}
+\end{frame}
+% The table show how the condition number of the interpolation matrix for the
+% divergence-free ($A_{divFree}$) and the traditional ($A_{trad}$) cases. We see
+% that the condition number of $A_{divFree}$ grows a little bit more faster than
+% $A_{trad}$. The idea is to pass that we need to deal with the ill-conditioning
+% issue. One alternative to this is the RBF-FD type methods. Also mention that
+% you are using the same shape parameter for all runs, there are better results
+% in terms of condition number if we tweak the shape parameter.
+
+\begin{frame}{RBF-FD}
+  \begin{itemize}
+    \item To avoid the ill-condition of the interpolation matrix we might use
+      the RBF-FD approach.
+  \end{itemize}
+  \begin{center}
+    \includegraphics[width=0.55\linewidth]{../img/grid}
+  \end{center}
+\end{frame}
+% Here we should explain that the condition number for a few number of points is
+% reasonable so it might be a good idea to use a RBF-FD type methods. The
+% picture of the grid should help on the discription of the RBF-FD method. The
+% gray points represent the whole grid, the ones in blue+red the stencil and the
+% one in red the point where we wish to know the derivative.
+
+\begin{frame}{Higher accuracy on some derivatives}
+  \begin{center}
+    \includegraphics[width=0.55\linewidth]{../img/errorDecayFDRBFdivFree}
+  \end{center}
+  
+  \begin{itemize}
+    \item For the $V$ component, the decay is faster on $V_y$.
+  \end{itemize}
+\end{frame}
+% This slide show one of the interesting results of the presentation: we get the
+% derivatives related to the divergence-free equation ($u_x+v_y=0$) to converge
+% twice as fast then the other ones. This might be due to the extra information
+% that we get from the divergence-free equation.
+
+\section{Polynomial interpolants}
+\begin{frame}{Polynomial interpolants}
+  \begin{itemize}
+    \item The stream function $\psi$ is can be used to create a divergence-free
+      vector field.
+      \begin{equation*}
+	\psi(x,y) = \sum_{i=0}^N\sum_{j=0}^N a_{ij}x^i y^j.
+      \end{equation*}
+    
+    \item $\mathbf{P} = \nabla \times (0,0,\psi) = (\psi_y,-\psi_x,0)$
+
+    \item The interpolation condition leads to a linear system that might have
+      many solutions or no one.
+
+    \item Use the least squares solution
+  \end{itemize}
+\end{frame}
+% We can always try to generate divergence-free interpolants trying to
+% approximate the stream function, on this case we are using a tensor polynomial
+% base (I guess we could use other basis, like Chebyshev and Fourier, but I'm
+% not sure yet). Since is not an easy task to know if we can find such an
+% interpolant, we look for least squares solutions of the linear system in hope
+% to at least find the best approximation to it for the degree utilize $N$.
+
+\begin{frame}{Error decay of the derivatives for polynomial interpolant}
+  \begin{figure}[htb]
+    \begin{center}
+      \includegraphics[width=0.5\linewidth]{../img/errorDecayFDdivFree}
+      \includegraphics[width=0.5\linewidth]{../img/errorDecayFDdivFreeSmallN}
+    \end{center}
+    \caption{$N=10,\ldots,100$. The right picture uses a polynomial of degree 
+      $2$ and the left picture degree $3$. $U_{x}$ and $U_{y}$, denote the 
+      approximation of the partial derivatives of the first component of 
+      $\mathbf{f}$.}
+  \end{figure}
+  
+  \begin{itemize}
+    \item The degrees of freedom on the stream function let we get better
+      results for $u_x$ and $v_y$.
+      
+    \item If we use $N$ not big enough we do not achieve a faster rate of
+      convergence for the derivatives.
+  \end{itemize}
+\end{frame}
+% Here we see that using $N$ small or big makes a difference on the rate of
+% convergence of the derivatives. For the case of the 9 points stencil, we found
+% that with $N=5$ and removing some redundant terms we can get a full rank
+% square system $18\times 18$. The numerical results do not differ in terms
+% of convergence, nevertheless we don't have a rank-deficient system of 
+% $18\times 36$ that we get when we use $N = 5$ without removing the redundant
+% terms.
+
+\section{Lebesgue constants}
+\begin{frame}{Lebesgue constants}
+  \begin{center}
+    \includegraphics[width=0.55\linewidth]{../img/lebesgueConstGrowth}
+  \end{center}
+\end{frame}
+% For all cases the Lebesgue constant grows with the amount of points utilized,
+% however we see that for different shape parameters we have different rates of
+% growth (smaller $\varepsilon$ faster the rate). Moreover, for the polynomial
+% interpolant we have fastest rate (note that we are using equally-spaced 
+% nodes). The results might change for different distribution of nodes.
+
+\begin{frame}{Using different set of nodes}
+  \begin{itemize}
+    \item Kosloff & Tal-Ezer mapping:
+      \begin{equation*}
+        x_j^{kte(\alpha)} := \frac{\arcsin(\alpha x_j^{cheb})}{\arcsin(\alpha)},
+	\quad j = 1,\ldots, \qquad x_j^{cheb} = \cos{\frac{\pi(j-1)}{N-1}}.
+      \end{equation*}
+  \end{itemize}
+
+  \begin{table}[hptb]
+    \begin{center}
+      \begin{tabular}{l||l|l}
+        \multicolumn{1}{c||}{$\sqrt{N}$} & 
+	\multicolumn{1}{c}{$Cond(A_{divFree})$} & 
+	\multicolumn{1}{c}{$Cond(A_{trad})$} \\
+        \hline \hline
+        $2$ & $1.35\times 10^{0}$ & $1.08\times 10^{0}$ \\
+        $3$ & $3.82\times 10^{1}$ & $9.79\times 10^{0}$ \\
+        $4$ & $7.36\times 10^{3}$ & $4.41\times 10^{2}$ \\
+        $5$ & $4.49\times 10^{6}$ & $4.94\times 10^{4}$ \\
+        $6$ & $4.87\times 10^{9}$ & $1.06\times 10^{7}$ \\
+        $7$ & $8.11\times 10^{12}$ & $3.72\times 10^{9}$ \\
+        $8$ & $1.76\times 10^{16}$ & $1.91\times 10^{12}$ \\
+        $9$ & $1.93\times 10^{17}$ & $1.40\times 10^{15}$ \\
+        $10$ & $2.52\times 10^{18}$ & $1.23\times 10^{17}$ \\
+        $11$ & $2.33\times 10^{19}$ & $5.19\times 10^{17}$ \\
+        $12$ & $5.04\times 10^{18}$ & $1.81\times 10^{19}$ \\
+        $13$ & $1.94\times 10^{20}$ & $5.43\times 10^{18}$ \\
+        $14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
+        $15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
+    \end{tabular}
+    \end{center}
+    \caption{Condition number of the interpolation matrices of the 
+    divergence-free and traditional methods. $\varepsilon = 2$}
+  \end{table}
+\end{frame}
+% FIX TABLE (DO IT ACTUALLY) AND WRITE COMMENTS!
+
+\begin{frame}{Conclusion and future work}
+  \begin{itemize}
+    \item Conclusion
+
+    \item Future work
+  \end{itemize}
+\end{frame}
+% COMMENTS!!!!
+
+\begin{thebibliography}{1}
+  \bibitem{bidiagonalization}  Hnetynkova, I. and Plesinger, M.. 
+    \emph{The regularizing effect of the Golub-Kahan iterative bidiagonalization 
+      and revealing the noise level in the data.}
+      BIT Numer Math (2009) 49: 669-696.
+\end{thebibliography}
+% COMMENTS ON THE REFERENCES!!!
+
+\end{document}
