@@ -66,10 +66,12 @@ hold off
 %% Optimizing node this distribution for RBF interpolant
 % Now we use the Kosloff & Tal-Ezer mapping and the function |fminbnd| to
 % find a distribution of points which is the tensor product of the nodes:
+%
 % $$
 % x_j^{kte(\alpha)} := \frac{\arcsin(\alpha x_j^{cheb})}{\arcsin(\alpha)},
 % \quad j = 1,\ldots,n,
 % $$
+%
 % where $x_j^{cheb} = cos(\frac{\pi j}{n - 1})$.
 display('Optimizing node distribution for RBF interpolant')
 minConstRBF = zeros(length(totalPoints),length(shapeParameters));
@@ -89,7 +91,7 @@ for ep = shapeParameters
     j = j + 1;
 end
 
-%% Tables of Kosloff & Tal-Ezer parameters and Lebesgue constants (RBF)
+%% Table of Kosloff & Tal-Ezer parameters and Lebesgue constants (RBF)
 rows = num2str(totalPoints); columns = num2str(shapeParameters);
 display('minConstRBF')
 printmat(minConstRBF,'N\e', rows, columns)
@@ -109,6 +111,6 @@ for n = totalPoints
     i = i + 1;
 end
 
-%% Tables of Kosloff & Tal-Ezer parameters and Lebesgue constants (Poly)
+%% Table of Kosloff & Tal-Ezer parameters and Lebesgue constants (Poly)
 rows = num2str(totalPoints); columns = 'LebesgueConst alpha';
 printmat([minConstPoly, alphasPoly],'PolyCase', rows, columns)

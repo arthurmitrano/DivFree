@@ -93,7 +93,7 @@ if alpha == 1
     [X, Y] = meshgrid( h*(-floor(numPts/2):1:floor(numPts/2)) );
 else
     xCheb = sort(cos(pi*(0:numPts-1)/(numPts-1)));
-    [X, Y] = meshgrid( h*asin(alpha*xCheb)/asin(alpha) );
+    [X, Y] = meshgrid( asin(alpha*xCheb)/asin(alpha) );
 end
 
 Xu = X(interpPts.u); Yu = Y(interpPts.u); 
