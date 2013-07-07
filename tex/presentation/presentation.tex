@@ -19,6 +19,7 @@
 
 \usepackage[english]{babel}
 \usepackage[latin1]{inputenc}
+\usepackage{color}
 
 \usepackage{times}
 \usepackage[T1]{fontenc}
@@ -172,8 +173,8 @@ Approximations}
     \item Enforcing the interpolation conditions lead to the linear system 
       $A\mathbf{c} = \mathbf{f}$.
       
-    \item The interpolation matrix $A$ is positive-definite for the right choice
-      of basic function $\varphi$.
+    \item The interpolation matrix $A$ is positive-definite for some choice of
+      basic function $\varphi$.
 
     \item $\varepsilon$ has a key role in the accuracy of the approximation and
       the conditioning of $A$.
@@ -212,8 +213,8 @@ Approximations}
       \end{equation*}
       where $\Psi(\mathbf{x},\mathbf{y}) = X_\mathbf{n_x}
       (-\nabla\nabla^T\psi(\mathbf{x} - \mathbf{y}))X_{\mathbf{n_y}}^T$ with
-      $X_\mathbf{a}\mathbf{b} = \mathbf{a}\times\mathbf{b}$. \emph{Reference:
-	``Divergence-free RBFs on surfaces''}.
+      $X_\mathbf{a}\mathbf{b} = \mathbf{a}\times\mathbf{b}$. \emph{Narcowich,
+      Ward and Wright (2007), ``Divergence-free RBFs on surfaces''}.
   \end{itemize}
 \end{frame}
 % The objective here is to introduce the divergence-free RBF interpolant
@@ -243,15 +244,15 @@ Approximations}
       \begin{gather*}
         \mathbf{t_j} = (u_j,v_j), \quad \mathbf{s}_k = (s_k^u,s_k^v)\\
         \mathbf{d} = A\mathbf{c},\\
-        \mathbf{d} = [u_1 v_1 \cdots u_N v_N]^{T}, \quad
-        \mathbf{c} = [s_1^u s_1^v \cdots s_N^u s_N^v]^{T}
+        \mathbf{d} = [u_1 \ v_1 \cdots u_N \ v_N]^{T}, \quad
+        \mathbf{c} = [s_1^u \ s_1^v \cdots s_N^u \ s_N^v]^{T}
       \end{gather*}
 
     \item $A$ is a $2N\times 2N$ matrix composed of blocks $\Psi(\mathbf{x}_j,
       \mathbf{x}_k)$.
 
-    \item \emph{Narcowich, Ward and Wright} prove that $A$ is positive-definite,
-      therefore invertible.
+    \item \emph{Narcowich, Ward and Wright (2007)} prove that $A$ is positive-definite
+      if $\varphi$ is positive-definite.
     \end{itemize}
 \end{frame}
 % From the interpolation conditions we can extract (after some organization) a
@@ -267,8 +268,8 @@ Approximations}
       \begin{gather*}
 	\mathbf{d}_x = A_x\mathbf{c} \quad \rightarrow \quad \mathbf{d}_x =
 	A_x A^{-1}\mathbf{d} \\
-	\mathbf{d}_x = [u_x(\mathbf{x}_1) v_x(\mathbf{x}_1) \cdots 
-	u_x(\mathbf{x}_N) v_x(\mathbf{x}_N)]^T
+	\mathbf{d}_x = [u_x(\mathbf{x}_1) \ v_x(\mathbf{x}_1) \cdots 
+	u_x(\mathbf{x}_N) \ v_x(\mathbf{x}_N)]^T
       \end{gather*}
 
     \item $A_x$ is $2N\times 2N$ matrix with $2x2$ block entries:
@@ -297,8 +298,8 @@ Approximations}
 % CONDITION NUMBER, THERE IS NO REASON TO HOPE THE DIFFERENTIATION MATRIX
 % (BASED ON A) WILL PERFORM WELL.
 
-\subsection{Condition number of A}
-\begin{frame}{Analizing the spectral coefficients}
+\subsection{Condition number of interpolation matrix}
+\begin{frame}{Condition number of A}%{Analizing the spectral coefficients}
   \begin{table}[hptb]
     \begin{center}
       \begin{tabular}{l||l|l}
@@ -320,7 +321,7 @@ Approximations}
         $13$ & $1.94\times 10^{20}$ & $5.43\times 10^{18}$ \\
         %$14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
         %$15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
-    \end{tabular}
+    \end{tabular}   
     \end{center}
     \caption{Condition number of the interpolation matrices of the 
     divergence-free and traditional methods. $\varepsilon = 2$}
@@ -334,6 +335,49 @@ Approximations}
 % you are using the same shape parameter for all runs, there are better results
 % in terms of condition number if we tweak the shape parameter.
 
+\begin{frame}{Condition number of A}
+  \begin{table}[hptb]
+    \begin{center}
+      \begin{tabular}{l||l|l}
+        \multicolumn{1}{c||}{$\sqrt{N}$} & 
+	\multicolumn{1}{c|}{$Cond(A_{divFree})$} & 
+	\multicolumn{1}{c}{$Cond(A_{trad})$} \\
+        \hline \hline
+        $3$ & $1.1\times 10^{0}$ & $1.0\times 10^{0}$ \\
+        $4$ & $3.3\times 10^{0}$ & $1.5\times 10^{0}$ \\
+        $5$ & $1.9\times 10^{1}$ & $4.6\times 10^{0}$ \\
+        $6$ & $1.5\times 10^{2}$ & $2.2\times 10^{1}$ \\
+        $7$ & $2.9\times 10^{3}$ & $1.5\times 10^{2}$ \\
+        $8$ & $1.1\times 10^{5}$ & $1.3\times 10^{3}$ \\
+        $9$ & $5.8\times 10^{6}$ & $1.6\times 10^{4}$ \\
+        $10$ & $4.4\times 10^{8}$ & $2.6\times 10^{5}$ \\
+        $11$ & $4.4\times 10^{10}$ & $5.4\times 10^{6}$ \\
+        $12$ & $5.7\times 10^{12}$ & $1.4\times 10^{8}$ \\
+        $13$ & $9.1\times 10^{14}$ & $4.6\times 10^{9}$ \\
+    \end{tabular}
+    \end{center}
+    \caption{Condition number of the interpolation matrices of the 
+    divergence-free and traditional methods. $\varepsilon = 5$}
+  \end{table}
+\end{frame}
+% When we change the shape parameter we can use large number of points before
+% the interpolation matrix get ill-conditioned. Note that the condition number
+% of the divergence-free method increases faster.
+
+\begin{frame}{Condition number of A}
+  \begin{figure}[htb]
+    \begin{center}
+      \includegraphics[width=0.5\linewidth]{../img/condNumberGrowthE2}
+      \includegraphics[width=0.5\linewidth]{../img/condNumberGrowthE5}
+    \end{center}
+    \caption{Left: $\varepsilon = 2$, right: $\varepsilon=5$.}
+  \end{figure}
+\end{frame}
+% Here we can see clearly that the condition number for the divergence-free
+% method increase at a faster rate. To avoid this ill conditioning problem we
+% can use the RBF-FD approach
+
+\subsection{RBF-FD}
 \begin{frame}{RBF-FD}
   \begin{itemize}
     \item To avoid the ill-condition of the interpolation matrix we might use
@@ -361,7 +405,36 @@ Approximations}
 % This slide show one of the interesting results of the presentation: we get the
 % derivatives related to the divergence-free equation ($u_x+v_y=0$) to converge
 % twice as fast then the other ones. This might be due to the extra information
-% that we get from the divergence-free equation.
+% that we get from the divergence-free condition.
+
+
+\begin{frame}{Divergence-free information}
+  \begin{itemize}
+    \item Assume that
+      \begin{equation*}
+	\left\{
+        \begin{aligned}
+	  u(x,y) &= u_1(x,y) + u_2(y) \\
+	  v(x,y) &= v_1(x,y) + v_2(x)
+        \end{aligned}
+	\right.
+      \end{equation*}
+
+    \item Divergence-free condition: $0 = u_x + v_y = {u_1}_x + {v_1}_y$.
+
+    \item The divergence-free condition do not add information for describing
+      $u_2$ and $v_2$, only interpolation does.
+
+    \item We can enlarge the stencil to get the same accuracy of $O(N^{-4})$ 
+      for, $u_y$ and $v_x$ since the approximation comes from interpolation
+      points only.
+  \end{itemize}
+\end{frame}
+% On this slide we should talk about why we do not get an high accuracy on the
+% derivatives not related to the divergence-free equation. Assume there is a
+% part of a $u$ depending on y and $v$ depending in x, this way those parts are
+% not influenced by the divergence-free condition at all. Therefore, the
+% convergence results should match with the ones of tradition interpolation.
 
 \section{Polynomial interpolants}
 \begin{frame}{Polynomial interpolants}
@@ -413,54 +486,91 @@ Approximations}
 % terms.
 
 \section{Lebesgue constants}
+
 \begin{frame}{Lebesgue constants}
   \begin{center}
-    %\includegraphics[width=0.55\linewidth]{../img/lebesgueConstGrowth}
+    \includegraphics[width=\linewidth]{../img/lebesgueConstGrowth}
   \end{center}
 \end{frame}
 % For all cases the Lebesgue constant grows with the amount of points utilized,
 % however we see that for different shape parameters we have different rates of
 % growth (smaller $\varepsilon$ faster the rate). Moreover, for the polynomial
-% interpolant we have fastest rate (note that we are using equally-spaced 
+% interpolant we have largest constants (note that we are using equally-spaced 
 % nodes). The results might change for different distribution of nodes.
 
+\subsection{Kosloff \& Tal-Ezer mapping}
 \begin{frame}{Using different set of nodes}
   \begin{itemize}
     \item Kosloff \& Tal-Ezer mapping:
       \begin{equation*}
         x_j^{kte(\alpha)} := \frac{\arcsin(\alpha x_j^{cheb})}{\arcsin(\alpha)},
-	\quad j = 1,\ldots, \quad x_j^{cheb} = \cos{\frac{\pi(j-1)}{N-1}}.
+	\quad j = 1,\ldots,N.
       \end{equation*}
-  \end{itemize}
+      where $x_j^{cheb} = \cos{\frac{\pi(j-1)}{N-1}}$.
 
-  %\begin{table}[hptb]
-  %  \begin{center}
-  %    \begin{tabular}{l||l|l}
-  %      \multicolumn{1}{c||}{$\sqrt{N}$} & 
-	%\multicolumn{1}{c}{$Cond(A_{divFree})$} & 
-	%\multicolumn{1}{c}{$Cond(A_{trad})$} \\
-        %\hline \hline
-        %$2$ & $1.35\times 10^{0}$ & $1.08\times 10^{0}$ \\
-        %$3$ & $3.82\times 10^{1}$ & $9.79\times 10^{0}$ \\
-        %$4$ & $7.36\times 10^{3}$ & $4.41\times 10^{2}$ \\
-        %$5$ & $4.49\times 10^{6}$ & $4.94\times 10^{4}$ \\
-        %$6$ & $4.87\times 10^{9}$ & $1.06\times 10^{7}$ \\
-        %$7$ & $8.11\times 10^{12}$ & $3.72\times 10^{9}$ \\
-        %$8$ & $1.76\times 10^{16}$ & $1.91\times 10^{12}$ \\
-        %$9$ & $1.93\times 10^{17}$ & $1.40\times 10^{15}$ \\
-        %$10$ & $2.52\times 10^{18}$ & $1.23\times 10^{17}$ \\
-        %$11$ & $2.33\times 10^{19}$ & $5.19\times 10^{17}$ \\
-        %$12$ & $5.04\times 10^{18}$ & $1.81\times 10^{19}$ \\
-        %$13$ & $1.94\times 10^{20}$ & $5.43\times 10^{18}$ \\
-        %$14$ & $4.72\times 10^{19}$ & $8.88\times 10^{18}$ \\
-        %$15$ & $2.63\times 10^{19}$ & $5.45\times 10^{19}$   
-    %\end{tabular}
-    %\end{center}
-    %\caption{Condition number of the interpolation matrices of the 
-    %divergence-free and traditional methods. $\varepsilon = 2$}
-  %\end{table}
+    \item As $\alpha \rightarrow 0$ the nodes converge to the Chebyshev points.
+
+    \item If $\alpha = 1$ the nodes are equally-spaced.
+  \end{itemize}
 \end{frame}
-% FIX TABLE (DO IT ACTUALLY) AND WRITE COMMENTS!
+% Talk about the Kosloff & Tal-Ezer mapping saying what happens when you chose
+% different values of $\alpha$, in particular the extreme cases of $\alpha = 1$
+% (equally-spaced points) and $\alpha \rightarrow 0$ (Chebyshev points).
+
+\begin{frame}{Using different set of nodes}
+  \begin{table}[hptb]
+    \begin{center}
+      \begin{tabular}{l||ll|ll|ll}
+        \multicolumn{1}{c||}{$\sqrt{N}$} & 
+	\multicolumn{2}{c|}{$\varepsilon = 2$} & 
+	\multicolumn{2}{c|}{$\varepsilon = 5$} &
+	\multicolumn{2}{c}{$\varepsilon = 10$}\\
+        \hline \hline
+	$3$ & {\color{blue}$1.7$} & $1.7$ & {\color{blue}$1.0$} & $1.0$ &
+	{\color{blue}$1.0$} & $1.0$\\
+	$5$ & {\color{blue}$5.8$} & $8.2$ & {\color{blue}$1.6$} & $1.2$ &
+	{\color{blue}$1.0$} & $1.0$\\
+	$7$ & {\color{blue}$13.6$} & $14.4$ & {\color{blue}$2.9$} & $2.9$ &
+	{\color{blue}$1.6$} & $1.0$\\
+	$9$ & {\color{blue}$24.0$} & $36.2$ & {\color{blue}$5.4$} & $6.7$ &
+	{\color{blue}$1.6$} & $1.2$\\
+	$11$ & {\color{blue}$44.4$} & $250.4$ & {\color{blue}$15.7$} & $18.3$ &
+	{\color{blue}$1.9$} & $1.9$\\
+	$13$ & {\color{blue}$205.8$} & $1.2\times 10^4$ & {\color{blue}$24.7$} &
+	$26.3$ & {\color{blue}$2.9$} & $2.9$\\   
+      \end{tabular}
+    \end{center}
+    \caption{{\color{blue}(blue)}: optimized $\alpha$; (black): $\alpha = 1$.}
+  \end{table}
+\end{frame}
+% Here we see that choosing different $\alpha$ gave smaller Lebesgue constants
+% for the case $\varepsiolon = 2$ which is close to the polynomial case. For the
+% other two values of shape parameter the Lebesgue constant is not high for
+% equally-spaced points so the optimization routine to find $\alpha$ doesn't
+% need to be used.
+
+\begin{frame}{Using different set of nodes}
+  \begin{table}[hptb]
+    \begin{center}
+      \begin{tabular}{l||ll|l}
+        \multicolumn{1}{c||}{$\sqrt{N}$} & 
+	\multicolumn{2}{c|}{Polynomial} &
+	\multicolumn{1}{c}{$\alpha$}\\
+        \hline \hline
+	$3$ & {\color{blue}$16.5$} & $16.5$ & $0.382$\\
+	$5$ & {\color{blue}$18.0$} & $80.3$ & $0.441$\\
+	$7$ & {\color{blue}$25.5$} & $1.4\times 10^3$ & $0.090$\\
+	$9$ & {\color{blue}$33.7$} & $1.5\times 10^4$ & $0.600$\\
+	$11$ & {\color{blue}$40.2$} & $7.8\times 10^4$ & $0.026$\\
+	$13$ & {\color{blue}$45.4$} & $5.5\times 10^5$ & $0.345$\\   
+      \end{tabular}
+    \end{center}
+    \caption{{\color{blue}(blue)}: optimized $\alpha$; (black): $\alpha = 1$.}
+  \end{table}
+\end{frame}
+% As was show on the previous plot, the Lebesgue constant for the polynomial
+% case are very large for equally-spaced points. However, after optimize the
+% value of $\alpha$, the Lebesgue constants decreased for reasonable values.
 
 \section{Conclusion and future work}
 \begin{frame}{Conclusion and future work}
