@@ -212,7 +212,7 @@ Approximations}
 	{\Psi(\mathbf{x},\mathbf{x}_k)\mathbf{s}_k}
       \end{equation*}
       where $\Psi(\mathbf{x},\mathbf{y}) = X_\mathbf{n_x}
-      (-\nabla\nabla^T\psi(\mathbf{x} - \mathbf{y}))X_{\mathbf{n_y}}^T$ with
+      (-\nabla\nabla^T\varphi(\mathbf{x} - \mathbf{y}))X_{\mathbf{n_y}}^T$ with
       $X_\mathbf{a}\mathbf{b} = \mathbf{a}\times\mathbf{b}$. \emph{Narcowich,
       Ward and Wright (2007), ``Divergence-free RBFs on surfaces''}.
   \end{itemize}
@@ -230,8 +230,8 @@ Approximations}
   \end{equation*}
 
   \begin{equation*}
-    F(r) = \frac{1}{r}\phi'(r), \quad G(r) = 
-    \frac{1}{r}\left(\frac{1}{r}\phi'(r)\right)' = \frac{1}{r}F'(r)
+    F(r) = \frac{1}{r}\varphi'(r), \quad G(r) = 
+    \frac{1}{r}\left(\frac{1}{r}\varphi'(r)\right)' = \frac{1}{r}F'(r)
   \end{equation*}
 \end{frame}
 % This slide is just to show the kernel for two dimensions, maybe is better to
@@ -285,8 +285,9 @@ Approximations}
 
 \begin{frame}{Error decay of divergence-free RBF interpolant derivatives}
   \begin{center}
-    %\includegraphics[width=0.55\linewidth]{../img/decayRBFderivatives}
-    $\varepsilon = 2$
+    \includegraphics[width=.90\linewidth]{../img/decayDerivativesRBFe10}
+    
+    $\varepsilon = 10$
   \end{center}
 \end{frame}
 % This plot is to show de decay of the derivatives of the first component of the
@@ -485,9 +486,69 @@ Approximations}
 % $18\times 36$ that we get when we use $N = 5$ without removing the redundant
 % terms.
 
-\section{Lebesgue constants}
+\section{Lebesgue constant}
+\subsection{Definition}
+\begin{frame}{Lebesgue constant: Definition}
+  \begin{itemize}
+    \item Let $I_n$ be the interpolation operator in a set of nodes. The 
+      \emph{Lebesgue constant} is the operator norm of $I_n$.
 
-\begin{frame}{Lebesgue constants}
+    \item Let $p^* \in \Pi_n$ be the best approximation to $f$, then
+      \begin{equation*}
+	||f - I_n(f)|| \le (1 + \Lambda_n) ||f - p^*||.
+      \end{equation*}
+
+    \item The Lebesgue constant measures the sensitivity of the interpolation
+      problem in a set of nodes.
+
+    \item To calculate the Lebesgue constant:
+      \begin{enumerate}
+        \item Find the cardinal functions $\phi_i(x)$, such that $\phi_i(x_j) = 
+	  \delta_{ij}$.
+	\item $\Lambda_n = max_{x \in \Omega}\sum_{i=0}^n \phi_i(x)$.
+      \end{enumerate}
+  \end{itemize}
+\end{frame}
+% In this slide we should talk about why we are bringing up Lebesgue constant.
+% The reason is because we can compare the polynomial and RBF divergence-free
+% methods and also analyze the sensibility of interpolation for them.
+% After the reason, we should define Lebesgue constant as the norm of the
+% interpolation operator. Moreover, we should describe the way we are
+% calculating the Lebesgue functions.
+
+\subsection{Cardinal functions}
+\begin{frame}{Some cardinal functions}
+  \begin{center}
+    \includegraphics[width=\linewidth]{../img/cardinalFunctionRBF1}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Some cardinal functions}
+  \begin{center}
+    \includegraphics[width=\linewidth]{../img/cardinalFunctionRBF2}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Some cardinal functions}
+  \begin{center}
+    \includegraphics[width=\linewidth]{../img/cardinalFunctionRBF3}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Some cardinal functions}
+  \begin{center}
+    \includegraphics[width=\linewidth]{../img/cardinalFunctionRBF4}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Some cardinal functions}
+  \begin{center}
+    \includegraphics[width=\linewidth]{../img/cardinalFunctionRBF5}
+  \end{center}
+\end{frame}
+
+\subsection{Growth with number of points}
+\begin{frame}{Lebesgue constants for divergence-free interpolant}
   \begin{center}
     \includegraphics[width=\linewidth]{../img/lebesgueConstGrowth}
   \end{center}
@@ -572,22 +633,40 @@ Approximations}
 % case are very large for equally-spaced points. However, after optimize the
 % value of $\alpha$, the Lebesgue constants decreased for reasonable values.
 
-\section{Conclusion and future work}
-\begin{frame}{Conclusion and future work}
-  \begin{itemize}
-    \item Conclusion
-
-    \item Future work
-  \end{itemize}
-\end{frame}
+%\section{Conclusion and future work}
+%\begin{frame}{Conclusion and future work}
+%  \begin{itemize}
+%    \item Conclusion
+%
+%    \item Future work
+%  \end{itemize}
+%\end{frame}
 % COMMENTS!!!!
 
-\begin{thebibliography}{1}
-  \bibitem{bidiagonalization}  Hnetynkova, I. and Plesinger, M.. 
-    \emph{The regularizing effect of the Golub-Kahan iterative bidiagonalization 
-      and revealing the noise level in the data.}
-      BIT Numer Math (2009) 49: 669-696.
-\end{thebibliography}
+\section<presentation>*{\appendixname}
+\subsection<presentation>*{References}
+
+\begin{frame}[allowframebreaks]
+  \frametitle<presentation>{References}
+    
+  \begin{thebibliography}{1}
+    
+    \bibitem{fasshauer}
+      G{.}E{.} Fasshauer.
+      \emph{Meshfree Approximation Methods with MATLAB.}
+      World Scientific Publishing Co{.} Pte{.} Ltd{.},
+      Hackensack, NJ, 2007.
+ 
+    
+  %\beamertemplatearticlebibitems
+  % Followed by interesting articles. Keep the list short. 
+
+    \bibitem{grady}
+      F{.}J{.} Narcowich, J{.}D{.} Ward, and G{.}B{.} Wright.
+      \emph{Divergence-free RBFs on Surfaces.}
+      J. Fourier Anal. Appl., 13 (2007), 643-663.
+  \end{thebibliography}
+\end{frame}
 % COMMENTS ON THE REFERENCES!!!
 
 \end{document}

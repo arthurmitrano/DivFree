@@ -76,12 +76,13 @@ for p = 1:2*n^2  % all interpolation points
 %         mesh(XX,YY,cardFunctionU)
         normcard = sqrt(cardFunctionU.^2+cardFunctionV.^2);
         quiver(XX,YY,cardFunctionU,cardFunctionV,max(max(normcard)))
-        axis tight
+        %axis tight
+        axis([-1 1 -1 1])
         hold on, plot(X,Y,'.k','markersize',20)
         plot(X(i,j),Y(i,j),'or','markersize',20), hold off
 %         axis([-1 1 -1 1 -.5 1])
         title(['Cardinal Function U for (i,j) = (' num2str(i) ',' ...
-               num2str(j) ')'])
+               num2str(j) ')'],'FontSize',15)
     
 %         h2 = subplot(1,2,2);
 %         mesh(XX,YY,cardFunctionV)
@@ -91,7 +92,7 @@ for p = 1:2*n^2  % all interpolation points
 %
 %         set([h1 h2], 'clim', [-.5 1])
         snapnow
-        pause(1)
+        pause
     end
 
     lebesgueFunctionU = lebesgueFunctionU + abs(cardFunctionU);
