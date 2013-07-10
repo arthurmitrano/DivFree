@@ -28,11 +28,10 @@
 
 \usepackage{graphics}
 
-\title[i]{A Numerical Study of the Accuracy of Divergence-Free Kernel 
-Approximations}
+\title[]{A Numerical Study of the Accuracy of Divergence-Free Kernel Approximations}
 \subtitle{}
 
-\author[Arthur Mitrano]
+\author[]
 {Arthur Mitrano}
 % - Give the names in the same order as the appear in the paper.
 % - Use the \inst{?} command only if the authors have different
@@ -46,7 +45,7 @@ Approximations}
 % - Keep it simple, no one is interested in your street address.
 
 \date[AN13] % (optional, should be abbreviation of conference name)
-{April, 2013}
+{SIAM Annual Meeting - July, 2013}
 % - Either use conference name or its abbreviation.
 % - Not really informative to the audience, more for people (including
 %   yourself) who are reading the slides online
@@ -285,9 +284,9 @@ Approximations}
 
 \begin{frame}{Error decay of divergence-free RBF interpolant derivatives}
   \begin{center}
-    \includegraphics[width=.90\linewidth]{../img/decayDerivativesRBFe10}
+    \includegraphics[width=.90\linewidth]{../img/decayDerivativesRBF}
     
-    $\varepsilon = 10$
+    $\varepsilon = 2$
   \end{center}
 \end{frame}
 % This plot is to show de decay of the derivatives of the first component of the
@@ -298,6 +297,16 @@ Approximations}
 % DERIVATIVES. THE REASON FOR THAT IS IF THE INTERPOLATION MATRIX HAS A LARGE
 % CONDITION NUMBER, THERE IS NO REASON TO HOPE THE DIFFERENTIATION MATRIX
 % (BASED ON A) WILL PERFORM WELL.
+
+\begin{frame}{Error decay of divergence-free RBF interpolant derivatives}
+  \begin{center}
+    \includegraphics[width=.90\linewidth]{../img/decayDerivativesRBFe10}
+    
+    $\varepsilon = 10$
+  \end{center}
+\end{frame}
+% For this slide we should mention the fast convergence of the derivative $u_x$
+% in comparison with $u_y$.
 
 \subsection{Condition number of interpolation matrix}
 \begin{frame}{Condition number of A}%{Analizing the spectral coefficients}
@@ -544,6 +553,12 @@ Approximations}
 \begin{frame}{Some cardinal functions}
   \begin{center}
     \includegraphics[width=\linewidth]{../img/cardinalFunctionRBF5}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Some cardinal functions}
+  \begin{center}
+    \includegraphics[width=\linewidth]{../img/cardinalFunctionRBFBadCond}
   \end{center}
 \end{frame}
 

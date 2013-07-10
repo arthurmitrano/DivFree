@@ -33,7 +33,11 @@ end
 
 %% Generating the 2d grid of n^2 equispaced nodes
 xCheb = sort(cos(pi*(0:n-1)/(n-1)));
-x = asin(alpha*xCheb)/asin(alpha);
+if (alpha ~= 0)
+    x = asin(alpha*xCheb)/asin(alpha);
+else
+    x = xCheb;
+end
 xx = linspace(-1,1,7*n);
 
 [X,Y] = meshgrid(x);
