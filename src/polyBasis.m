@@ -17,8 +17,8 @@ numPts = 3;  % number of points in one dimension
 % 
 % However, for the code below (using |N = 5|), we are removing the terms of
 % 10th, 9th, 8th and 7th degrees (combining the degrees in $x$ and $y$).
-% Moreover, we take out the following 6th degree terms:$x^5y$, $x^4y^2$ and
-% $x^3y^3$. 
+% Moreover, we take out the following 6th degree terms: $x^5y$, $x^4y^2$
+% and $x^3y^3$.
 % 
 % With this combination of terms, we get *full rank (18)* system with *22 
 % unknows*. Alternatively, we could remove the following 6th degree terms
