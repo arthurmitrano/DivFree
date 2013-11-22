@@ -69,16 +69,17 @@ Sx = diff(S, x); v = -Sx;
 Sy = diff(S, y); u = +Sy;   % div(rot( (0,0,S) )) = 0
 coeffs = sym('c', [length(u), 1]);
 
-ux = diff(u, x); % ux and vy are used to impose div-free condition, and,
-vy = diff(v, y); % just like uy and vx, are returned as numerical
-uy = diff(u, y); % derivatives.
-vx = diff(v, x);
+if nargout > 3
+    ux = diff(u, x); % ux and vy are used to impose div-free condition, and,
+    vy = diff(v, y); % just like uy and vx, are returned as numerical
+    uy = diff(u, y); % derivatives.
+    vx = diff(v, x);
 
-ux = matlabFunction(ux*coeffs,'vars',{x y coeffs});
-vy = matlabFunction(vy*coeffs,'vars',{x y coeffs});
-uy = matlabFunction(uy*coeffs,'vars',{x y coeffs});
-vx = matlabFunction(vx*coeffs,'vars',{x y coeffs});
-
+    ux = matlabFunction(ux*coeffs,'vars',{x y coeffs});
+    vy = matlabFunction(vy*coeffs,'vars',{x y coeffs});
+    uy = matlabFunction(uy*coeffs,'vars',{x y coeffs});
+    vx = matlabFunction(vx*coeffs,'vars',{x y coeffs});
+end
 u = matlabFunction(u,'vars',[x y]);
 v = matlabFunction(v,'vars',[x y]);
 

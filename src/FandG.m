@@ -8,12 +8,11 @@
 % G(r) = \frac{F^{\prime}(r)}{r}.
 % $$
 %%
-function [F, G, dF, dG] = FandG(ep, rbf)
+function [F, G, dF, dG] = FandG(rbf)
 % Find the expressions for the annonymous functions F, G and it's
 % derivatives.
 %
 % INPUT:
-% ep  : shape parameter
 % rbf : radial basis function (annonymous)
 %
 % OUTPUT:
@@ -24,7 +23,7 @@ function [F, G, dF, dG] = FandG(ep, rbf)
 % expression once for a particular basic RBF, such as gaussians or
 % multiquadrics.
 
-syms r
+syms ep r
 
 F = simplify( 1/r * diff(rbf(ep,r), r) );
 dF = simplify( diff(F,r) );

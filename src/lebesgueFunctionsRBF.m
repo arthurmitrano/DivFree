@@ -68,7 +68,7 @@ for p = 1:2*n^2  % all interpolation points
     coeffs = A\d;
     coeffs = reshape(coeffs, 2, size(t,1))';  % I'm not keeping the coeffs
     
-    cardFunction = RBFdivFreeInterp(coeffs, ePoints, dSites, F, G);
+    cardFunction = RBFdivFreeInterp(coeffs, ePoints, dSites, F, G, ep);
     cardFunctionU = reshape(cardFunction(:,1), size(XX));
     cardFunctionV = reshape(cardFunction(:,2), size(XX));
 
