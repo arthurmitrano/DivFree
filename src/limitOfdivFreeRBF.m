@@ -14,7 +14,7 @@ alpha = 1;  % 1: equally-spaced; 0: cheb points
 rbf = @(ep,r) 1./(1 + (ep*r).^2);
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2);
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
-ep = sym(1/100000);
+ep = sym(1/10);
 
 %% Generating the 2d grid of n^2 equispaced nodes
 % xCheb = sort(cos(pi*(0:n-1)/(n-1)));
@@ -35,19 +35,19 @@ dSites = sym([X(:) Y(:)]);    % interpolation points
 ePoints = sym([XX(:) YY(:)]); % evaluation points
 
 %% Calculating RBF interpolant
-r = sym(DistanceMatrix(dSites, dSites));
-d1 = sym(DifferenceMatrix(dSites(:,1), dSites(:,1)));
-d2 = sym(DifferenceMatrix(dSites(:,2), dSites(:,2)));
-[A, Dx, Dy, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep);
+r = DistanceMatrix(dSites, dSites);
+d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
+d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
+[A, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep);
 
 %%
-U = [1 0 0; 0 0 0; 0 0 0]; V = [0 0 0; 0 0 0; 0 0 0];
+U = [1 0 0; 0 1 0; 0 0 1]; V = [0 0 0; 0 0 0; 0 0 0];
 t = sym([U(:) V(:)]);
-d = reshape(t', 1, numel(t))';
+d = reshape(t.', 1, numel(t)).';
 coeffsSym = A\d;
-coeffs = reshape(coeffsSym, 2, size(t,1))';
+coeffs = reshape(coeffsSym, 2, size(t,1)).';
 
-interp = RBFdivFreeInterp(coeffs, ePoints, dSites, F, G, ep);
+interp = RBFdivFreeInterp(coeffs, r, d1, d2, F, G, ep);
 interpU = reshape(interp(:,1), size(XX));
 interpV = reshape(interp(:,2), size(XX));
 
@@ -65,8 +65,6 @@ coeffsP = M\[U(uIdx); V(vIdx)];
 
 resU = max(max(abs(polyInterpU(XX,YY,coeffsP) - double(interpU))))
 resV = max(max(abs(polyInterpV(XX,YY,coeffsP) - double(interpV))))
-% resU = abs(polyInterpU(XX,YY,coeffsP) - double(interpU));
-% resV = abs(polyInterpV(XX,YY,coeffsP) - double(interpV));
 
 %% Plotting
 figure(1)

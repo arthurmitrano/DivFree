@@ -1,7 +1,7 @@
 %% Lebesgue functions of divergence-free RBFs interpolants
 % This function calculates cardinal and Lebesgue function (global
 % interolation). For more information on how the divergence-free RBF
-% interpolant is created, see the file <RBF_DivFreeMatrix.html
+% interpolant is created, see the file <FreeMatrix.html
 % |RBF_DivFreeMatrix.m|> and the paper _"Divergence-Free RBFs on Surfaces"_
 % of _Narcowich_, _Ward_ and _Wright_.
 
@@ -50,7 +50,7 @@ ePoints = [XX(:) YY(:)]; % evaluation points
 r = DistanceMatrix(dSites, dSites);
 d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
-[A, Dx, Dy, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep);
+[A, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep);
 
 L = zeros(n,2*n);  % used to construct delta function
 
@@ -68,7 +68,7 @@ for p = 1:2*n^2  % all interpolation points
     coeffs = A\d;
     coeffs = reshape(coeffs, 2, size(t,1))';  % I'm not keeping the coeffs
     
-    cardFunction = RBFdivFreeInterp(coeffs, ePoints, dSites, F, G, ep);
+    cardFunction = RBFdivFreeInterp(coeffs, r, d1, d2, F, G, ep);
     cardFunctionU = reshape(cardFunction(:,1), size(XX));
     cardFunctionV = reshape(cardFunction(:,2), size(XX));
 

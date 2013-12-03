@@ -53,15 +53,18 @@ ePoints = [XX(:) YY(:)]; % evaluation points
 r = DistanceMatrix(dSites, dSites);
 d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
-[A, Dx, Dy, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2);%Just for Aep
+[A, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2);%Just for Aep
 
-U = [0 0 0; 0 1 0; 0 0 0];
+U = [1 0 0; 0 1 0; 0 0 1];
 V = zeros(3,3);
 
 t = [U(:) V(:)];
-d = reshape([U(:) V(:)]',1,numel(t))';
+% d = reshape(t.',1,numel(t)).';
+d = zeros(2*n^2,1);
+d(1:2:end) = t(:,1);
+d(2:2:end) = t(:,2);
 
-interp = RBFdivFreeInterpComplex(Aep, d, ePoints, dSites, F, G, ep);
+interp = RBFdivFreeInterpComplex(Aep, d, r, d1, d2, F, G, ep);
 interpU = zeros([size(ep) size(XX)]); interpV = interpU;
 
 for i = 1:size(ep,1)

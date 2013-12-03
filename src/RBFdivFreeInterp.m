@@ -3,18 +3,15 @@
 % |ePoints| with interpolation points |dSites| and coefficients |coeffs|.
 
 %%
-function t = RBFdivFreeInterp(coeffs, ePoints, dSites, F, G, ep)
+function t = RBFdivFreeInterp(coeffs, r, d1, d2, F, G, ep)
 % Evaluate the RBF divergence-free interpolant in the evaluation points
 % coeffs  : coefficients of the divFree RBF interpolant
-% ePoints : evaluation points
-% dSites  : interpolation points
-% F, G    : functions used to create the kernel and evaluate the 
-%           interpolant (anonymous functions)
-% ep      : shape parameter of the rbf
-
-r = DistanceMatrix(ePoints, dSites);
-d1 = DifferenceMatrix(ePoints(:,1), dSites(:,1));
-d2 = DifferenceMatrix(ePoints(:,2), dSites(:,2));
+% r    : distance matrix
+% d1   : difference matrix for 1st coordinate
+% d2   : difference matrix for 2nd coordinate
+% F, G : functions used to create the kernel and evaluate the 
+%        interpolant (anonymous functions)
+% ep   : shape parameter of the rbf
 
 s1 = coeffs(:,1);
 s2 = coeffs(:,2);
