@@ -14,7 +14,7 @@ alpha = 1;  % 1: equally-spaced; 0: cheb points
 rbf = @(ep,r) 1./(1 + (ep*r).^2);
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2);
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
-ep = sym(1/10);
+ep = sym(1/100);
 
 %% Generating the 2d grid of n^2 equispaced nodes
 % xCheb = sort(cos(pi*(0:n-1)/(n-1)));
@@ -41,13 +41,17 @@ d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
 [A, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep);
 
 %%
-U = [1 0 0; 0 1 0; 0 0 1]; V = [0 0 0; 0 0 0; 0 0 0];
+U = [1 0 0; 0 0 0; 0 0 0]; V = [0 0 0; 0 0 0; 0 0 0];
 t = sym([U(:) V(:)]);
 d = reshape(t.', 1, numel(t)).';
 coeffsSym = A\d;
 coeffs = reshape(coeffsSym, 2, size(t,1)).';
 
-interp = RBFdivFreeInterp(coeffs, r, d1, d2, F, G, ep);
+r_ePoints = DistanceMatrix(ePoints, dSites);
+d1_ePoints = DifferenceMatrix(ePoints(:,1), dSites(:,1));
+d2_ePoints = DifferenceMatrix(ePoints(:,2), dSites(:,2));
+interp = RBFdivFreeInterp(coeffs, r_ePoints, d1_ePoints, d2_ePoints, F, ...
+                          G, ep);
 interpU = reshape(interp(:,1), size(XX));
 interpV = reshape(interp(:,2), size(XX));
 
