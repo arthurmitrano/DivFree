@@ -10,8 +10,9 @@
 % Where
 %
 % $$\Psi^\varepsilon(\mathbf{x},\mathbf{y}) = -F^\varepsilon(r)I -
-% G^\varepsilon(r)(\mathbf{x} - \mathbf{y})(\mathbf{x} - \mathbf{y})^T,$$
-%
+% G^\varepsilon(r)\left[\matrix{(x_2 - y_2)^2&-(x_1 - y_1)(x_2 - y_2)\cr
+% -(x_1 - y_1)(x_2 - y_2)&(x_1 - y_1)^2\cr}\right],$$
+% 
 % with
 %
 % $$ F^\varepsilon(r) = \frac{\varphi^\prime(r,\varepsilon)}{r} \quad and
@@ -30,22 +31,27 @@
 
 %% Setup for the script
 clear, clc
-syms ep r x1 x2 y1 y2
-
+syms ep r x1 x2 y1 y2 X Y
+assume(X,'real')
+assume(Y,'real')
 x = [x1; x2];
 y = [y1; y2];
 
-x_e = [1/3;1/5];  % evaluation point
+x_e = [X;Y];  % evaluation point
 
-% rbf = @(ep,r) exp(-(ep*r).^2);
-rbf = @(ep,r) 1./(1 + (ep*r).^2);
+takeLimit = true;
+
+rbf = @(ep,r) exp(-(ep*r).^2);
+% rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2);
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
 
+% Constructing divergence-free kernel
 F = matlabFunction(diff(rbf(ep,r),r)/r);
-G = matlabFunction(diff(F,r)/r);
+G = matlabFunction(diff(F(ep,r),r)/r);
+R = sym([0 -1; 1 0]);
 K = @(ep,x,y) -F(ep,norm(x-y))*eye(2) ...
-              -G(ep,norm(x-y))*(x-y)*(x-y).';  % divergence-free kernel
+              -G(ep,norm(x-y))*R*(x-y)*(x-y).'*R.';
 
 %% 1 interpolation point U(0,0) = 1
 
@@ -53,12 +59,30 @@ disp('1 interpolation point')
 
 U = [1];
 V = [0];
-d = [U; V];
+t = [U(:) V(:)];
+d = reshape(t.',1,numel(t)).';
 
-A = K(ep,[0;0],[0;0]);
+x_i = [0 0]';  % interpolation points
+
+A = sym('A',2*size(x_i,2));
+for i = 1:size(x_i,2)
+    for j = 1:size(x_i,2)
+        A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
+    end
+end
+
 s = A\d;
-t = K(ep,x_e,[0;0])*s;
-limit(t,ep,0)
+t = [0;0];  % initializing
+for i = 1:size(x_i,2)
+    t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
+end
+
+if takeLimit
+    disp('taking limit')
+    L = limit(simplify(t),ep,0);
+    disp('Limit when ep -> 0')
+    pretty(L)
+end
 
 %% 2 interpolation points U(0,0) = 1 & U(1,0) = 0
 
@@ -71,11 +95,25 @@ d = reshape(t.',1,numel(t)).';
 
 x_i = [0 0; 1 0]';  % interpolation points
 
-A = [K(ep,x_i(:,1),x_i(:,1)) K(ep,x_i(:,1),x_i(:,2)); ...
-     K(ep,x_i(:,2),x_i(:,1)) K(ep,x_i(:,2),x_i(:,2))];
+A = sym('A',2*size(x_i,2));
+for i = 1:size(x_i,2)
+    for j = 1:size(x_i,2)
+        A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
+    end
+end
+
 s = A\d;
-t = K(ep,x_e,x_i(:,1))*s(1:2) + K(ep,x_e,x_i(:,2))*s(3:4);
-limit(t,ep,0)
+t = [0;0];  % initializing
+for i = 1:size(x_i,2)
+    t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
+end
+
+if takeLimit
+    disp('taking limit')
+    L = limit(simplify(t),ep,0);
+    disp('Limit when ep -> 0')
+    pretty(L)
+end
 
 %% 3 interpolation points U(0,0) = 1, U(1,0) = 0 & U(-1,0) = 0
 
@@ -88,12 +126,25 @@ d = reshape(t.',1,numel(t)).';
 
 x_i = [0 0; 1 0; -1 0]';  % interpolation points
 
-A = [K(ep,x_i(:,1),x_i(:,1)) K(ep,x_i(:,1),x_i(:,2)) K(ep,x_i(:,1),x_i(:,3)); ...
-     K(ep,x_i(:,2),x_i(:,1)) K(ep,x_i(:,2),x_i(:,2)) K(ep,x_i(:,2),x_i(:,3)); ...
-     K(ep,x_i(:,3),x_i(:,1)) K(ep,x_i(:,3),x_i(:,2)) K(ep,x_i(:,3),x_i(:,3))];
+A = sym('A',2*size(x_i,2));
+for i = 1:size(x_i,2)
+    for j = 1:size(x_i,2)
+        A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
+    end
+end
+
 s = A\d;
-t = K(ep,x_e,x_i(:,1))*s(1:2) + K(ep,x_e,x_i(:,2))*s(3:4) + K(ep,x_e,x_i(:,3))*s(5:6);
-limit(t,ep,0)
+t = [0;0];  % initializing
+for i = 1:size(x_i,2)
+    t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
+end
+
+if takeLimit
+    disp('taking limit')
+    L = limit(simplify(t),ep,0);
+    disp('Limit when ep -> 0')
+    pretty(L)
+end
 
 %% 4 interpolation points U(0,0) = 1, U(1,0) = 0, U(-1,0) = 0 & U(1,1) = 0
 
@@ -104,17 +155,27 @@ V = [0 0 0 0];
 t = [U(:) V(:)];
 d = reshape(t.',1,numel(t)).';
 
-x_i = [0 0; 1 0; -1 0; 1 1]';  % interpolation points
+x_i = [-1 -1; 1 1; -1 1; 1 -1]';  % interpolation points
 
-A = [K(ep,x_i(:,1),x_i(:,1)) K(ep,x_i(:,1),x_i(:,2)) K(ep,x_i(:,1),x_i(:,3)) K(ep,x_i(:,1),x_i(:,4)); ...
-     K(ep,x_i(:,2),x_i(:,1)) K(ep,x_i(:,2),x_i(:,2)) K(ep,x_i(:,2),x_i(:,3)) K(ep,x_i(:,2),x_i(:,4)); ...
-     K(ep,x_i(:,3),x_i(:,1)) K(ep,x_i(:,3),x_i(:,2)) K(ep,x_i(:,3),x_i(:,3)) K(ep,x_i(:,3),x_i(:,4)); ...
-     K(ep,x_i(:,4),x_i(:,1)) K(ep,x_i(:,4),x_i(:,2)) K(ep,x_i(:,4),x_i(:,3)) K(ep,x_i(:,4),x_i(:,4))];
+A = sym('A',2*size(x_i,2));
+for i = 1:size(x_i,2)
+    for j = 1:size(x_i,2)
+        A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
+    end
+end
+
 s = A\d;
-t = K(ep,x_e,x_i(:,1))*s(1:2) + K(ep,x_e,x_i(:,2))*s(3:4) + ...
-    K(ep,x_e,x_i(:,3))*s(5:6) + K(ep,x_e,x_i(:,4))*s(7:8);
-limit(t,ep,0)
+t = [0;0];  % initializing
+for i = 1:size(x_i,2)
+    t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
+end
 
+if takeLimit
+    disp('taking limit')
+    L = limit(simplify(t),ep,0);
+    disp('Limit when ep -> 0')
+    pretty(L)
+end
 
 %% 5 interpolation points U=1 @ (0,0), U = 0 at the other points
 
@@ -127,6 +188,7 @@ d = reshape(t.',1,numel(t)).';
 
 x_i = [0 0; 0 1; 0 -1; -1 0; 1 0]';  % interpolation points
 
+A = sym('A',2*size(x_i,2));
 for i = 1:size(x_i,2)
     for j = 1:size(x_i,2)
         A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
@@ -134,36 +196,62 @@ for i = 1:size(x_i,2)
 end
 
 s = A\d;
-t = [0;0];
+t = [0;0];  % initializing
 for i = 1:size(x_i,2)
     t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
 end
-limit(t,ep,0)
 
-
-%% 9 interpolation points U=1 @ (1,1), U = 0 at the other points
-tic
-disp('9 interpolation points')
-
-U = [0 0 0 1 0 0 0 0 0];
-V = [0 0 0 0 0 0 0 0 0];
-t = [U(:) V(:)];
-d = reshape(t.',1,numel(t)).';
-
-x_i = [0 0; 1 0; -1 0; 1 1; 0 1; -1 1; 1 -1; 0 -1; -1 -1]';  % interpolation points
-
-for i = 1:size(x_i,2)
-    for j = 1:size(x_i,2)
-        A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
-    end
+if takeLimit
+    disp('taking limit')
+    L = limit(simplify(t),ep,0);
+    disp('Limit when ep -> 0')
+    pretty(L)
 end
 
-s = A\d; % Takes 700 seconds for inverse quadrics
-t = [0;0];
-for i = 1:size(x_i,2)
-    t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
-end
-toc
-tic
-limit(t,ep,0)
-toc
+% %% 9 interpolation points U=1 @ (1,1), U = 0 at the other points
+% tic
+% disp('9 interpolation points')
+% 
+% U = [0 0 0 1 0 0 0 0 0];
+% V = [0 0 0 0 0 0 0 0 0];
+% t = [U(:) V(:)];
+% d = reshape(t.',1,numel(t)).';
+% 
+% x_i = [0 0; 1 0; -1 0; 1 1; 0 1; -1 1; 1 -1; 0 -1; -1 -1]';  % interpolation points
+% 
+% A = sym('A',2*size(x_i,2));
+% for i = 1:size(x_i,2)
+%     for j = 1:size(x_i,2)
+%         A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
+%     end
+% end
+% s = A\d;    % takes 700 seconds
+% 
+% t = [0;0];  % initializing
+% for i = 1:size(x_i,2)
+%     t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
+% end
+% toc
+% 
+% tic
+% if takeLimit
+%     disp('taking limit')
+%     L = limit(simplify(t),ep,0);
+%     disp('Limit when ep -> 0')
+%     pretty(L)
+% end
+% toc
+% 
+% t1 = matlabFunction(t(1));
+% t2 = matlabFunction(t(2));
+% 
+% figure(1)
+% 
+% subplot(1,2,1)
+% mesh(xx,yy,t1(xx,yy,e))
+% title('U'), xlabel('x'), ylabel('y')
+% 
+% subplot(1,2,2)
+% mesh(xx,yy,t2(xx,yy,e))
+% title('V'), xlabel('x'), ylabel('y')
+% snapnow

@@ -32,9 +32,9 @@ end
 %%
 % Click <FandG.html here> for more info on the |FandG| function.
 %% Creating divergence-free RBF interpolation matrix
-A11 = -F(ep,r) - G(ep,r) .* d1.^2;
-A22 = -F(ep,r) - G(ep,r) .* d2.^2;
-A12 = -G(ep,r) .* d1 .* d2;
+A11 = -F(ep,r) - G(ep,r) .* d2.^2;
+A22 = -F(ep,r) - G(ep,r) .* d1.^2;
+A12 = +G(ep,r) .* d1 .* d2;
 % A21 = A12;
 
 % H1 = reshape([A11(:) A12(:)].', 2*n, n).';
