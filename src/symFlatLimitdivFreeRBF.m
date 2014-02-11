@@ -41,9 +41,10 @@ x_e = [X;Y];  % evaluation point
 
 takeLimit = true;
 
-rbf = @(ep,r) exp(-(ep*r).^2);
-% rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;
-% rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2);
+% rbf = @(ep,r) exp(-(ep*r).^2);        % gaussian
+rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;   % inverse multiquadric (beta = 2)
+% rbf = @(ep,r) 1./(1 + (ep*r).^2);     % inverse quadratic - not + def R^2
+% rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2); % IM - not strictly + def. in R^2
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
 
 % Constructing divergence-free kernel
@@ -81,19 +82,19 @@ if takeLimit
     disp('taking limit')
     L = limit(simplify(t),ep,0);
     disp('Limit when ep -> 0')
-    pretty(L)
+    pretty(simplify(L))
 end
 
 %% 2 interpolation points U(0,0) = 1 & U(1,0) = 0
 
 disp('2 interpolation points')
 
-U = [1 0];
+U = [0 1];
 V = [0 0];
 t = [U(:) V(:)];
 d = reshape(t.',1,numel(t)).';
 
-x_i = [0 0; 1 0]';  % interpolation points
+x_i = [0 0; 0 1]';  % interpolation points
 
 A = sym('A',2*size(x_i,2));
 for i = 1:size(x_i,2)
@@ -112,19 +113,19 @@ if takeLimit
     disp('taking limit')
     L = limit(simplify(t),ep,0);
     disp('Limit when ep -> 0')
-    pretty(L)
+    pretty(simplify(L))
 end
 
 %% 3 interpolation points U(0,0) = 1, U(1,0) = 0 & U(-1,0) = 0
 
 disp('3 interpolation points')
 
-U = [1 0 0];
+U = [0 1 0];
 V = [0 0 0];
 t = [U(:) V(:)];
 d = reshape(t.',1,numel(t)).';
 
-x_i = [0 0; 1 0; -1 0]';  % interpolation points
+x_i = [0 0; 0 1; 0 -1]';  % interpolation points
 
 A = sym('A',2*size(x_i,2));
 for i = 1:size(x_i,2)
@@ -143,19 +144,19 @@ if takeLimit
     disp('taking limit')
     L = limit(simplify(t),ep,0);
     disp('Limit when ep -> 0')
-    pretty(L)
+    pretty(simplify(L))
 end
 
 %% 4 interpolation points U(0,0) = 1, U(1,0) = 0, U(-1,0) = 0 & U(1,1) = 0
 
 disp('4 interpolation points')
 
-U = [1 0 0 0];
+U = [0 1 0 0];
 V = [0 0 0 0];
 t = [U(:) V(:)];
 d = reshape(t.',1,numel(t)).';
 
-x_i = [-1 -1; 1 1; -1 1; 1 -1]';  % interpolation points
+x_i = [-1 0; 0 1; 0 -1; 1 0]';  % interpolation points
 
 A = sym('A',2*size(x_i,2));
 for i = 1:size(x_i,2)
@@ -174,19 +175,19 @@ if takeLimit
     disp('taking limit')
     L = limit(simplify(t),ep,0);
     disp('Limit when ep -> 0')
-    pretty(L)
+    pretty(simplify(L))
 end
 
 %% 5 interpolation points U=1 @ (0,0), U = 0 at the other points
 
 disp('5 interpolation points')
 
-U = [1 0 0 0 0];
+U = [0 1 0 0 0];
 V = [0 0 0 0 0];
 t = [U(:) V(:)];
 d = reshape(t.',1,numel(t)).';
 
-x_i = [0 0; 0 1; 0 -1; -1 0; 1 0]';  % interpolation points
+x_i = [0 0; 1 0; 0 1; -1 0; 0 -1]';  % interpolation points
 
 A = sym('A',2*size(x_i,2));
 for i = 1:size(x_i,2)
@@ -205,43 +206,43 @@ if takeLimit
     disp('taking limit')
     L = limit(simplify(t),ep,0);
     disp('Limit when ep -> 0')
-    pretty(L)
+    pretty(simplify(L))
 end
 
-% %% 9 interpolation points U=1 @ (1,1), U = 0 at the other points
-% tic
-% disp('9 interpolation points')
-% 
-% U = [0 0 0 1 0 0 0 0 0];
-% V = [0 0 0 0 0 0 0 0 0];
-% t = [U(:) V(:)];
-% d = reshape(t.',1,numel(t)).';
-% 
-% x_i = [0 0; 1 0; -1 0; 1 1; 0 1; -1 1; 1 -1; 0 -1; -1 -1]';  % interpolation points
-% 
-% A = sym('A',2*size(x_i,2));
-% for i = 1:size(x_i,2)
-%     for j = 1:size(x_i,2)
-%         A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
-%     end
-% end
-% s = A\d;    % takes 700 seconds
-% 
-% t = [0;0];  % initializing
-% for i = 1:size(x_i,2)
-%     t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
-% end
-% toc
-% 
-% tic
-% if takeLimit
-%     disp('taking limit')
-%     L = limit(simplify(t),ep,0);
-%     disp('Limit when ep -> 0')
-%     pretty(L)
-% end
-% toc
-% 
+%% 9 interpolation points U=1 @ (1,1), U = 0 at the other points
+tic
+disp('9 interpolation points')
+
+U = [1 0 0 0 0 0 0 0 0];
+V = [0 0 0 0 0 0 0 0 0];
+t = [U(:) V(:)];
+d = reshape(t.',1,numel(t)).';
+
+x_i = [0 0; 1 0; -1 0; 1 1; 0 1; -1 1; 1 -1; 0 -1; -1 -1]';  % interpolation points
+
+A = sym('A',2*size(x_i,2));
+for i = 1:size(x_i,2)
+    for j = 1:size(x_i,2)
+        A((i-1)*2+1:2*i, (j-1)*2+1:2*j) = K(ep,x_i(:,i),x_i(:,j));
+    end
+end
+s = A\d;    % takes 700 seconds
+
+t = [0;0];  % initializing
+for i = 1:size(x_i,2)
+    t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
+end
+toc
+
+tic
+if takeLimit
+    disp('taking limit')
+    L = limit(simplify(t),ep,0);
+    disp('Limit when ep -> 0')
+    pretty(simplify(L))
+end
+toc
+
 % t1 = matlabFunction(t(1));
 % t2 = matlabFunction(t(2));
 % 

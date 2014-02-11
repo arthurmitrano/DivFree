@@ -4,6 +4,16 @@
 % interpolant is created, see the file <FreeMatrix.html
 % |RBF_DivFreeMatrix.m|> and the paper _"Divergence-Free RBFs on Surfaces"_
 % of _Narcowich_, _Ward_ and _Wright_.
+%
+% Calculates Lebesgue function and its constant. The function uses an
+% equispaced grid in x- and y-direction.
+%
+% n       : Number of points in x- and y-direction
+% display : displays the cardinal function (optional, default = false)
+% ep      : Shape parameter (optional, default = 2)
+% rbf     : Radial basis function (optional,
+%                                  default = @(ep,r) exp(-(ep*r).^2) )
+% alpha   : Parameter for the Kosloff & Tal-Ezer mapping (default = 1);
 
 %%
 function lebesgueConst = lebesgueFunctionsRBF(n, display, ep, rbf, alpha)
@@ -52,6 +62,10 @@ d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
 [A, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep);
 
+r_ePoints = DistanceMatrix(ePoints, dSites);
+d1_ePoints = DifferenceMatrix(ePoints(:,1), dSites(:,1));
+d2_ePoints = DifferenceMatrix(ePoints(:,2), dSites(:,2));
+
 L = zeros(n,2*n);  % used to construct delta function
 
 lebesgueFunctionU = zeros(size(XX));
@@ -63,12 +77,13 @@ for p = 1:2*n^2  % all interpolation points
     V = L(:,n+1:2*n);
     t =  [U(:) V(:)];  % vector field
     L(p) = 0;          % going back to zero matrix
-    
+
     d = reshape(t', 1, numel(t))';
     coeffs = A\d;
     coeffs = reshape(coeffs, 2, size(t,1))';  % I'm not keeping the coeffs
     
-    cardFunction = RBFdivFreeInterp(coeffs, r, d1, d2, F, G, ep);
+    cardFunction = RBFdivFreeInterp(coeffs, r_ePoints, d1_ePoints, ...
+                                    d2_ePoints, F, G, ep);
     cardFunctionU = reshape(cardFunction(:,1), size(XX));
     cardFunctionV = reshape(cardFunction(:,2), size(XX));
 

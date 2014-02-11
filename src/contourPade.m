@@ -7,20 +7,19 @@
 %% Setting up the script
 clear, clc
 n = 3;      % sqrt root of number of data sites
-alpha = 1;  % Kosloff & Tal-Ezer map parameter (1- equispaced; 0- Cheb)
+
 % rbf = @(ep,r) exp(-(ep*r).^2);
-rbf = @(ep,r) 1./(1 + (ep*r).^2);
+rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;  % beta = 2
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2);
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
 
-s = linspace(0,2*pi,100);  % to plot the circle
-rho = 1/(2*sqrt(2)) -0.01;                 % radius of the circle
-e0 = .4;
-complexPlane = true;
+s = linspace(0,2*pi,1000);  % to plot the circle
+rho = 1/(2*sqrt(2)) - .03;                 % radius of the circle
+e0 = 0;
+complexPlane = false;
 
 if complexPlane
     e = 0.001:0.05/4:1;
-%     [epX, epY] = meshgrid(e);
     [epX, epY] = meshgrid([-fliplr(e) e]);
     ep = epX + 1i*epY;
 else
@@ -28,12 +27,6 @@ else
 end
 
 %% Generating the 2d grid of n^2 equispaced nodes
-% xCheb = sort(cos(pi*(0:n-1)/(n-1)));
-% if (alpha ~= 0)
-%     x = asin(alpha*xCheb)/asin(alpha);
-% else
-%     x = xCheb;
-% end
 x = linspace(-1,1,n);
 if complexPlane
     xx = .75;
@@ -44,7 +37,7 @@ end
 [X,Y] = meshgrid(x);
 [XX,YY] = meshgrid(xx);
 
-dSites = [X(:) Y(:)];    % interpolation points
+dSites = [X(:) Y(:)];    % data points
 ePoints = [XX(:) YY(:)]; % evaluation points
 
 %% Calculating RBF interpolant
@@ -53,13 +46,12 @@ ePoints = [XX(:) YY(:)]; % evaluation points
 r = DistanceMatrix(dSites, dSites);
 d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
-[A, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2);%Just for Aep
+[~, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2); %Just for Aep
 
-U = [1 0 0; 0 0 0; 0 0 0];
+U = [0 0 0; 0 1 0; 0 0 0];
 V = zeros(3,3);
 
 t = [U(:) V(:)];
-% d = reshape(t.',1,numel(t)).';
 d = zeros(2*n^2,1);
 d(1:2:end) = t(:,1);
 d(2:2:end) = t(:,2);
@@ -95,7 +87,7 @@ if (size(ePoints,1) == 1)
     xlabel('Re'), ylabel('Im')
     hold on
     plot(rho*cos(s)+e0,rho*sin(s),'k--','LineWidth',2)
-    plot([0 0], [-1 1]/sqrt(2),'r*','MarkerSize',10)
+    plot([0 0], [-1 1]/(2*sqrt(2)),'r*','MarkerSize',10)
     hold off
     axis square
     
@@ -105,7 +97,7 @@ if (size(ePoints,1) == 1)
     xlabel('Re'), ylabel('Im')
     hold on
     plot(rho*cos(s)+e0,rho*sin(s),'k--','LineWidth',2)
-    plot([0 0], [-1 1]/sqrt(2),'r*','MarkerSize',10)
+    plot([0 0], [-1 1]/(2*sqrt(2)),'r*','MarkerSize',10)
     hold off
     axis square
 end
@@ -117,7 +109,7 @@ if (size(ep,1) == 1) || (size(ep,2) == 1)
     interpUatEps0 = 1/(2*pi) * squeeze(trapz(s, interpU));
     interpVatEps0 = 1/(2*pi) * squeeze(trapz(s, interpV));
 
-    figure(20)
+    figure(2)
     
     h1 = subplot(1,2,1);
     mesh(XX,YY,real(interpUatEps0))
