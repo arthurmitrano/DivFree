@@ -7,17 +7,21 @@ clear, clc, close all
 
 %%
 
-% rbf = @(ep,r) exp(-(ep*r).^2);        % gaussian
-rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;   % inverse multiquadric (beta = 2)
+rbf = @(ep,r) exp(-(ep*r).^2);        % gaussian
+% rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;   % inverse multiquadric (beta = 2)
 % rbf = @(ep,r) 1./(1 + (ep*r).^2);     % inverse quadratic - not + def R^2
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2); % IM - not strictly + def. in R^2
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
 
+pointwise = true;  % false: take the limit ep->0 symbolically at (X,Y)
+                   % true : evaluate the interp at (XX,YY) and then take
+                   %        the limit.
+
 %% Evaluation and data points
-X = [0 -1  0 1];
-Y = [1  0 -1 0];
-U = [1  0  0 0];
-V = [0  0  0 0];
+X = [0 -1 -1  1 1 1 0 -1  0];
+Y = [0 -1  1 -1 1 0 1  0 -1];
+U = [1  0  0  0 0 0 0  0  0];
+V = [0  0  0  0 0 0 0  0  0];
 
 t = [U(:) V(:)];
 d = zeros(2*numel(U),1);
@@ -26,8 +30,9 @@ d(2:2:end) = t(:,2);
 
 dSites = [X(:) Y(:)];    % data points
 
-xx = linspace(-1,1,40);
-[XX, YY] = meshgrid(xx);
+% xx = linspace(-1,1,40);
+% [XX, YY] = meshgrid(xx);
+[XX, YY] = chebpts2(32); % using Chebyshev points to evaluate polynomial
 ePoints = [XX(:) YY(:)]; % evaluation points
 
 %% Contour-Padé
@@ -79,6 +84,18 @@ if (size(ep,1) == 1) || (size(ep,2) == 1)
     set([h1 h2], 'clim', [-.5 1])
 end
 
+pU = chebfun2(interpUatEps0);
+pV = chebfun2(interpVatEps0);
+pUcoeffs = chebpoly2(pU);
+pVcoeffs = chebpoly2(pV);
+ppU = chebpoly2function(pUcoeffs);
+ppV = chebpoly2function(pVcoeffs);
+
+syms X Y
+disp('ppU')
+pretty(expand(sym(ppU(X,Y))))
+disp('ppV')
+pretty(expand(sym(ppV(X,Y))))
 %% Symbolic
 syms ep r x1 x2 y1 y2 X Y
 assume(X,'real')
@@ -109,14 +126,32 @@ for i = 1:size(x_i,2)
     t = t + K(ep,x_e,x_i(:,i))*s((i-1)*2+1:2*i);
 end
 
-
 disp('taking limit')
-L = simplify(limit(simplify(t),ep,0));
-disp('Limit when ep -> 0')
-pretty(L)
-L1 = matlabFunction(L(1),'vars',{X,Y});
-L2 = matlabFunction(L(2),'vars',{X,Y});
+if ~pointwise
+    L = simplify(limit(simplify(t),ep,0));
+    disp('Limit when ep -> 0')
+    pretty(L)
+    L1 = matlabFunction(L(1),'vars',{X,Y});
+    L2 = matlabFunction(L(2),'vars',{X,Y});
+else
+    epSmall = 1e-6;
+    L1 = double(subs( subs(t(1),{X,Y},{XX,YY}), ep,epSmall));
+    L2 = double(subs( subs(t(2),{X,Y},{XX,YY}), ep,epSmall));
+    disp('Creating polynomial via chebfun2')
+    pL1 = chebfun2(L1);
+    pL2 = chebfun2(L2);
+    pL1coeffs = chebpoly2(pL1);
+    pL2coeffs = chebpoly2(pL2);
+    L1 = chebpoly2function(pL1coeffs);
+    L2 = chebpoly2function(pL2coeffs);
 
+%     disp(['L1 ''limit'' (epSmall = ' num2str(epSmall) ')'])
+%     pretty(expand(L1(X,Y)))
+%     disp(['L2 ''limit'' (epSmall = ' num2str(epSmall) ')'])
+%     pretty(expand(L2(X,Y)))
+end
+
+%% Plotting
 figure(2)
 set(gcf, 'Position', [100 100 2*500 1*500])
 
