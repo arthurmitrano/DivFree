@@ -23,10 +23,10 @@ for n = nn
     [u, v, ux, vx, uy, vy] = testFunction(X, Y, k1, k2);
     
     gridCenterX = (length(xx) + 1)/2; gridCenterY = (length(yy) + 1)/2;
-    uxAtO_Exact = ux(gridCenterX, gridCenterY);
-    uyAtO_Exact = uy(gridCenterX, gridCenterY);
-    vxAtO_Exact = vx(gridCenterX, gridCenterY);
-    vyAtO_Exact = vy(gridCenterX, gridCenterY);
+    uxAtO_Exact = ux;
+    uyAtO_Exact = uy;
+    vxAtO_Exact = vx;
+    vyAtO_Exact = vy;
     % NOTE: We are using length to get the analytical derivative at zero, 
     % for now that is what we want to focus on. Later, we will generalize
     % this code for different stencil position.
@@ -89,7 +89,7 @@ end
 figure(1)
 loglog(nn,uxErr,'r.-', nn,uyErr,'b.-', nn,uxErrFD,'rs-', ...
        nn,uyErrFD,'bs-', nn,nn.^-2,'b--', nn,nn.^-4,'r--')
-legend('uxErr','uyErr','uxErrFD','uyErrFD','N^{-2}','N^{-4}', ...
+legend('uxErrDivFD','uyErrDivFD','uxErrFD','uyErrFD','N^{-2}','N^{-4}', ...
        'Location','Best')
 title('Error on u derivatives')
 xlabel('N'), ylabel('Error')
@@ -97,7 +97,7 @@ xlabel('N'), ylabel('Error')
 figure(2)
 loglog(nn,vxErr,'r.-', nn,vyErr,'b.-', nn,vxErrFD,'rs-', ...
        nn,vyErrFD,'bs-', nn,nn.^-2,'r--', nn,nn.^-4,'b--')
-legend('vxErr','vyErr','vxErrFD','vyErrFD','N^{-2}','N^{-4}', ...
+legend('vxErrDivFD','vyErrDivFD','vxErrFD','vyErrFD','N^{-2}','N^{-4}', ...
        'Location','Best')
 title('Error on v derivatives')
 xlabel('N'), ylabel('Error')

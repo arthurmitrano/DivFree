@@ -93,9 +93,15 @@ ppV = chebpoly2function(pVcoeffs);
 
 syms X Y
 disp('ppU')
-pretty(expand(sym(ppU(X,Y))))
+ppU = expand(sym(ppU(X,Y)));
+pretty(ppU)
+[ppUcoeffs, ppUterms] = coeffs(ppU);
+[ppUcoeffs.' ppUterms.']
 disp('ppV')
-pretty(expand(sym(ppV(X,Y))))
+ppV = expand(sym(ppV(X,Y)));
+pretty(ppV)
+[ppVcoeffs, ppVterms] = coeffs(ppV);
+[ppVcoeffs.' ppVterms.']
 %% Symbolic
 syms ep r x1 x2 y1 y2 X Y
 assume(X,'real')
