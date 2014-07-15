@@ -11,7 +11,7 @@ rbf = @(e,r) exp(-(e*r).^2);
 ep = 2;  % Shape parameter
 
 numPts = 3;   % numPts^2 points in the stencil
-nn = 11:4:120; % Works for n odd only
+nn = 11:10:120; % Works for n odd only
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 
@@ -23,8 +23,7 @@ ZZ(2,2) = 0;
 % theta = pi/2*rand(1);
 theta = pi/4;
 for n = nn
-    n
-    tic
+    n, tic
     
     % Generating the center grid ------------------------------------------
     x = linspace(-1,1,n);
@@ -50,7 +49,9 @@ for n = nn
     % ---------------------------------------------------------------------
     
     % Getting testFunction values -----------------------------------------
-    [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2);
+%     [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2);
+    f = @(x,y) cos(x^3 + y^3) + sin(x^2 + y^2) + x + y;
+    [u, v, ux, vx, uy, vy, origin] = testFunction2(X,Y, f);
     uxAtO_Exact = ux;
     uyAtO_Exact = uy;
     vxAtO_Exact = vx;
