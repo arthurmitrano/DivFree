@@ -43,7 +43,9 @@ constPoly = zeros(length(totalPoints),1);
 
 i = 1;
 for n = totalPoints
-    constPoly(i) = lebesgueFunctions(n,n+4);
+%     constPoly(i) = lebesgueFunctions(n,n+4);
+    % Testing for points close to Chebyshev points
+    constPoly(i) = lebesgueFunctions(n,n+4,n,false,0.001);
     i = i + 1;
 end
 

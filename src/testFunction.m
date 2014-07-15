@@ -8,12 +8,12 @@ if (nargin < 5)
     k = 1;
 end
 
-sx = 0.1; sy = 0.1; % Shift in X and Y
-X = X+sx; Y = Y+sy; % Shifted variables
+sx = 0.1; sy = 0.2; % Shift in X and Y
+% X = X+sx; Y = Y+sy; % Shifted variables
 
 syms x y
-u = @(x,y) +1/k1 * sin(k1*x) .* cos(k2*y);
-v = @(x,y) -1/k2 * cos(k1*x) .* sin(k2*y);
+u = @(x,y) +1/k1 * sin(k1*(x - sx)) .* cos(k2*(y - sy));
+v = @(x,y) -1/k2 * cos(k1*(x - sx)) .* sin(k2*(y - sy));
 
 % Calculating derivatives ----------------------------
 ux = matlabFunction(diff(u(x,y), x, k)); ux = ux(X,Y);

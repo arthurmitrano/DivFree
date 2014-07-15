@@ -6,7 +6,7 @@
 
 %% Setting up the script
 clear, clc
-n = 3;      % sqrt root of number of data sites
+n = 9;      % sqrt root of number of data sites
 
 % rbf = @(ep,r) exp(-(ep*r).^2);
 rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;  % beta = 2
@@ -14,9 +14,9 @@ rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;  % beta = 2
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
 
 s = linspace(0,2*pi,1000);  % to plot the circle
-rho = 1/(2*sqrt(2)) - .03;                 % radius of the circle
+rho = 1/(2*sqrt(2)) - .03;  % radius of the circle
 e0 = 0;
-complexPlane = false;
+complexPlane = true;
 
 if complexPlane
     e = 0.001:0.05/4:1;
@@ -48,8 +48,10 @@ d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
 [~, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2); %Just for Aep
 
-U = [0 0 0; 0 1 0; 0 0 0];
-V = zeros(3,3);
+% U = [0 0 0; 0 1 0; 0 0 0];
+center = ceil(n/2);
+U = zeros(n); U(center, center) = 1;
+V = zeros(n);
 
 t = [U(:) V(:)];
 d = zeros(2*n^2,1);
@@ -78,28 +80,33 @@ if (size(ePoints,1) == 1)
 %                         fliplr(interpV), interpV]);
     interpPlotU = interpU; interpPlotV = interpV;
     figure(1)
+    set(gcf, 'Position',[50 50 2*700 1*700])
     
     subplot(1,2,1)
     contour(epX,epY,abs(interpPlotU), (0:100))
 %     mesh(epX,epY,abs(interpPlotU))
     zlim([0 10])
-    title(['U(' num2str(ePoints(1,1)) ', ' num2str(ePoints(1,2)) ')'])
-    xlabel('Re'), ylabel('Im')
+    title(['$U^\varepsilon(' num2str(ePoints(1,1)) ', ' ...
+           num2str(ePoints(1,2)) ')$ with $\sqrt{N}$ = ' num2str(n)], ...
+           'Interpreter','latex', 'FontSize', 15)
+    xlabel('\Re', 'FontSize',13), ylabel('\Im', 'FontSize',13)
     hold on
     plot(rho*cos(s)+e0,rho*sin(s),'k--','LineWidth',2)
-    plot([0 0], [-1 1]/(2*sqrt(2)),'r*','MarkerSize',10)
-    hold off
+    plot([0 0], [-1 1]/(2*sqrt(2)),'m*','MarkerSize',10)
     axis square
+    hold off
     
     subplot(1,2,2)
     contour(epX,epY,abs(interpPlotV), (0:100))
-    title(['V(' num2str(ePoints(1,1)) ', ' num2str(ePoints(1,2)) ')'])
-    xlabel('Re'), ylabel('Im')
+    title(['$V^\varepsilon(' num2str(ePoints(1,1)) ', ' ...
+           num2str(ePoints(1,2)) ')$ with $\sqrt{N}$ = ' num2str(n)], ...
+           'Interpreter','latex', 'FontSize', 15)
+    xlabel('\Re', 'FontSize',13), ylabel('\Im', 'FontSize',13)
     hold on
     plot(rho*cos(s)+e0,rho*sin(s),'k--','LineWidth',2)
-    plot([0 0], [-1 1]/(2*sqrt(2)),'r*','MarkerSize',10)
-    hold off
+    plot([0 0], [-1 1]/(2*sqrt(2)),'m*','MarkerSize',10)
     axis square
+    hold off
 end
 %% Calculating the interpolant when the shape parameter is zero
 % For this we will use the Cauchy's intergral formula

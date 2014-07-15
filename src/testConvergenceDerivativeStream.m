@@ -59,7 +59,7 @@ for n = nn
     
     % No more extra interpolation points code!
     
-    coeffs = M\[U; V;];  % Get polynomial coefficients
+    coeffs = M\[U; V];  % Get polynomial coefficients
     
     % Numerical derivatives (inefficient code, will replace when we decide 
     % on the format of the interpolant):

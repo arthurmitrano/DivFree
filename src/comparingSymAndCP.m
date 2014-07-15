@@ -7,15 +7,16 @@ clear, clc, close all
 
 %%
 
-rbf = @(ep,r) exp(-(ep*r).^2);        % gaussian
-% rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;   % inverse multiquadric (beta = 2)
+% rbf = @(ep,r) exp(-(ep*r).^2);        % gaussian
+rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;   % inverse multiquadric (beta = 2)
 % rbf = @(ep,r) 1./(1 + (ep*r).^2);     % inverse quadratic - not + def R^2
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2); % IM - not strictly + def. in R^2
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
 
 pointwise = true;  % false: take the limit ep->0 symbolically at (X,Y)
                    % true : evaluate the interp at (XX,YY) and then take
-                   %        the limit.
+                   %        the "limit" (use ep small, take the limit
+                   %        with chebfun or take the simbolic limit).
 
 %% Evaluation and data points
 X = [0 -1 -1  1 1 1 0 -1  0];
