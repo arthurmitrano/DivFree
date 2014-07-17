@@ -11,7 +11,7 @@ rbf = @(e,r) exp(-(e*r).^2);
 ep = 2;  % Shape parameter
 
 numPts = 3;   % numPts^2 points in the stencil
-nn = 11:10:120; % Works for n odd only
+nn = 11:10:200; % Works for n odd only
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 
@@ -20,8 +20,8 @@ RX = rand(3,3);
 RY = rand(3,3);
 ZZ = ones(3);
 ZZ(2,2) = 0;
-% theta = pi/2*rand(1);
-theta = pi/4;
+theta = pi/2*rand(1);
+% theta = 0;
 for n = nn
     n, tic
     
@@ -35,8 +35,9 @@ for n = nn
     [X,Y] = meshgrid(x);
     
     % Perturbing the points
-%     X = X - (dx/4 + dx/2*RX).*ZZ;
-%     Y = Y - (dy/4 + dy/2*RY).*ZZ;
+    s = 2;
+    X = X - (dx/(2*s) + dx/s*RX).*ZZ;
+    Y = Y - (dy/(2*s) + dy/s*RY).*ZZ;
     Xnew = X(:)*cos(theta) + Y(:)*sin(theta);
     Ynew = -X(:)*sin(theta) + Y(:)*cos(theta);
     X(:) = Xnew;
