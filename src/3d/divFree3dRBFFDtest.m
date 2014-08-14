@@ -11,17 +11,17 @@ e = 2;  % Shape parameter
 numPts = 3;   % numPts^2 points in the stencil
 nn = 11:10:200; % Works for n odd only
 
-% Derivatives approximation -----------
-DuAtO = struct('x',{}, 'y',{}, 'z',{});
-DvAtO = struct('x',{}, 'y',{}, 'z',{});
-DwAtO = struct('x',{}, 'y',{}, 'z',{});
-% -------------------------------------
+% Derivatives approximation -----------------
+DuAtO = struct('x',{[]}, 'y',{[]}, 'z',{[]});
+DvAtO = struct('x',{[]}, 'y',{[]}, 'z',{[]});
+DwAtO = struct('x',{[]}, 'y',{[]}, 'z',{[]});
+% -------------------------------------------
 
-% Derivatives errors ------------------
-DuErr = struct('x',{}, 'y',{}, 'z',{});
-DvErr = struct('x',{}, 'y',{}, 'z',{});
-DwErr = struct('x',{}, 'y',{}, 'z',{});
-% -------------------------------------
+% Derivatives errors ------------------------
+DuErr = struct('x',{[]}, 'y',{[]}, 'z',{[]});
+DvErr = struct('x',{[]}, 'y',{[]}, 'z',{[]});
+DwErr = struct('x',{[]}, 'y',{[]}, 'z',{[]});
+% -------------------------------------------
 
 for n = nn
     n, tic
@@ -48,9 +48,9 @@ for n = nn
     % ---------------------------------------------------------------------
     
     % Getting testFunction values -----------------------------------------
-    F1 = @(x,y,z) x.^2 + y.^2 + z.^2;
-    F2 = @(x,y,z) x.^2 + y.^2 + z.^2;
-    F3 = @(x,y,z) x.^2 + y.^2 + z.^2;
+    F1 = @(x,y,z) sin((x-1).^2 + (y-1).^2 + (z-1).^2);
+    F2 = @(x,y,z) cos((x-.5).^2 + (y-.5).^2 + (z-.5).^2);
+    F3 = @(x,y,z) tanh((x+.5).^2 + (y-1).^2 + (z+1).^2);
     
     [u, v, w, Du, Dv, Dw, O] = testFunction3d(X,Y,Z, F1,F2,F3);
     t = [u(:) v(:) w(:)];

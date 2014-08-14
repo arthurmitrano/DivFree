@@ -15,11 +15,11 @@ nn = 11:10:200; % Works for n odd only
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 
-%%
 RX = rand(3,3);
 RY = rand(3,3);
 ZZ = ones(3);
 ZZ(2,2) = 0;
+%%
 theta = pi/2*rand(1);
 % theta = 0;
 for n = nn
@@ -44,9 +44,9 @@ for n = nn
     Y(:) = Ynew;
 
     dSites = [X(:) Y(:)];
-    r = DistanceMatrix(dSites, dSites);
     d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
     d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
+    r = DistanceMatrix(dSites, dSites);
     % ---------------------------------------------------------------------
     
     % Getting testFunction values -----------------------------------------

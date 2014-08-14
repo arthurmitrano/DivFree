@@ -66,7 +66,7 @@ Du.x = Du.x(O.i,O.j,O.k);
 Du.y = Du.y(O.i,O.j,O.k);
 Du.z = Du.z(O.i,O.j,O.k);
 
-
+Dv.x = Dv.x(O.i,O.j,O.k);
 Dv.y = Dv.y(O.i,O.j,O.k);
 Dv.z = Dv.z(O.i,O.j,O.k);
 
