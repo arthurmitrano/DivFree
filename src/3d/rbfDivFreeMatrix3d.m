@@ -5,14 +5,14 @@
 %
 %  INPUT:
 %  r    : distance matrix
-%  d1   : difference matrix on the first coordinate  (x)
-%  d2   : difference matrix on the second coordinate (y)
-%  d3   : difference matrix on the third coordinate  (z)
-%  t    : shape parameter of the kernel
+%  d1   : difference matrix on the first coordinate  (x).
+%  d2   : difference matrix on the second coordinate (y).
+%  d3   : difference matrix on the third coordinate  (z).
+%  t    : shape parameter of the kernel.
 %
 %  OUTPUT:
-%  A          : interpolation matrix. Invert to find interpolant coeffs
-%  Ax, Ay, Az : used to calculate derivative matrices, eg, Dx = Ax*inv(A)
+%  A          : interpolation matrix. Invert to find interpolant coeffs.
+%  Ax, Ay, Az : used to calculate derivative matrices, eg, Dx = Ax*inv(A).
 
 %%
 function [A, Ax, Ay, Az] = rbfDivFreeMatrix3d(r, d1, d2, d3, t)
