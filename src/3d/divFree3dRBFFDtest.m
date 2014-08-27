@@ -118,20 +118,29 @@ end
 figure(1)
 loglog(nn,DuErr.x,'r.-', nn,DuErr.y,'b.-', nn,DuErr.z,'k.-', ...
        nn,nn.^-2,'c--', nn,nn.^-4,'m--')
-legend('uxErr','uyErr','uzErr','N^{-2}','N^{-4}', 'Location','Best')
-title('Error on u derivatives')
-xlabel('N'), ylabel('Error')
+id = legend('u_x','u_y','u_z', 'Location','Best');
+set(id, 'FontSize',12)
+text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
+text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
+title('Error on u derivatives', 'FontSize', 14)
+xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
 
 figure(2)
 loglog(nn,DvErr.x,'r.-', nn,DvErr.y,'b.-', nn,DvErr.z,'k.-', ...
        nn,nn.^-2,'c--', nn,nn.^-4,'m--')
-legend('vxErr','vyErr','vzErr','N^{-2}','N^{-4}', 'Location','Best')
-title('Error on v derivatives')
-xlabel('N'), ylabel('Error')
+id = legend('v_x','v_y','v_z', 'Location','Best');
+set(id, 'FontSize',12)
+text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
+text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
+title('Error on v derivatives', 'FontSize', 14)
+xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
 
 figure(3)
 loglog(nn,DwErr.x,'r.-', nn,DwErr.y,'b.-', nn,DwErr.z,'k.-', ...
        nn,nn.^-2,'c--', nn,nn.^-4,'m--')
-legend('wxErr','wyErr','wzErr','N^{-2}','N^{-4}', 'Location','Best')
-title('Error on w derivatives')
-xlabel('N'), ylabel('Error')
+id = legend('w_x','w_y','w_z', 'Location','Best');
+set(id, 'FontSize',12)
+text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
+text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
+title('Error on w derivatives', 'FontSize', 14)
+xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)

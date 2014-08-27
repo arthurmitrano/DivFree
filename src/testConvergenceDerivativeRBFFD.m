@@ -96,12 +96,18 @@ end
 %% Plotting
 figure(1)
 loglog(nn,uxErr,'r.-', nn,uyErr,'b.-', nn,nn.^-2,'b--', nn,nn.^-4,'r--')
-legend('uxErr','uyErr','N^{-2}','N^{-4}', 'Location','Best')
-title('Error on u derivatives')
-xlabel('N'), ylabel('Error')
+id = legend('u_x','u_y', 'Location','Best');
+set(id, 'FontSize', 12)
+text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
+text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
+title('Error on u derivatives', 'FontSize', 14)
+xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
 
 figure(2)
 loglog(nn,vxErr,'r.-', nn,vyErr,'b.-', nn,nn.^-2,'r--', nn,nn.^-4,'b--')
-legend('vxErr','vyErr','N^{-2}','N^{-4}', 'Location','Best')
-title('Error on v derivatives')
-xlabel('N'), ylabel('Error')
+id = legend('v_x','v_y', 'Location','Best');
+set(id, 'FontSize', 12)
+text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
+text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
+title('Error on v derivatives', 'FontSize', 14)
+xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
