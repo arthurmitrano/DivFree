@@ -116,8 +116,9 @@ end
 
 %% Plotting
 figure(1)
-loglog(nn,DuErr.x,'r.-', nn,DuErr.y,'b.-', nn,DuErr.z,'k.-', ...
+loglog(nn,DuErr.x,'ro-', nn,DuErr.y,'bo-', nn,DuErr.z,'k.-', ...
        nn,nn.^-2,'c--', nn,nn.^-4,'m--')
+axis tight
 id = legend('u_x','u_y','u_z', 'Location','Best');
 set(id, 'FontSize',12)
 text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
@@ -126,8 +127,9 @@ title('Error on u derivatives', 'FontSize', 14)
 xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
 
 figure(2)
-loglog(nn,DvErr.x,'r.-', nn,DvErr.y,'b.-', nn,DvErr.z,'k.-', ...
+loglog(nn,DvErr.x,'ro-', nn,DvErr.y,'bo-', nn,DvErr.z,'k.-', ...
        nn,nn.^-2,'c--', nn,nn.^-4,'m--')
+axis tight
 id = legend('v_x','v_y','v_z', 'Location','Best');
 set(id, 'FontSize',12)
 text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
@@ -136,8 +138,9 @@ title('Error on v derivatives', 'FontSize', 14)
 xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
 
 figure(3)
-loglog(nn,DwErr.x,'r.-', nn,DwErr.y,'b.-', nn,DwErr.z,'k.-', ...
+loglog(nn,DwErr.x,'ro-', nn,DwErr.y,'bo-', nn,DwErr.z,'k.-', ...
        nn,nn.^-2,'c--', nn,nn.^-4,'m--')
+axis tight
 id = legend('w_x','w_y','w_z', 'Location','Best');
 set(id, 'FontSize',12)
 text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')

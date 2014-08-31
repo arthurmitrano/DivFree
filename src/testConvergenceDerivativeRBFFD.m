@@ -8,10 +8,10 @@ clc, clear
 k1 = 3; k2 = 7;  % Control the amout of vortices on the testFunction
 
 rbf = @(e,r) exp(-(e*r).^2);
-ep = 2;  % Shape parameter
+ep = 3;  % Shape parameter
 
 numPts = 3;   % numPts^2 points in the stencil
-nn = 11:10:200; % Works for n odd only
+nn = 11:10:400; % Works for n odd only
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 
@@ -20,8 +20,8 @@ RY = rand(3,3);
 ZZ = ones(3);
 ZZ(2,2) = 0;
 %%
-theta = pi/2*rand(1);
-% theta = 0;
+% theta = pi/7;
+theta = 0;
 for n = nn
     n, tic
     
@@ -35,7 +35,7 @@ for n = nn
     [X,Y] = meshgrid(x);
     
     % Perturbing the points
-    s = 2;
+    s = 10;
     X = X - (dx/(2*s) + dx/s*RX).*ZZ;
     Y = Y - (dy/(2*s) + dy/s*RY).*ZZ;
     Xnew = X(:)*cos(theta) + Y(:)*sin(theta);
@@ -50,9 +50,10 @@ for n = nn
     % ---------------------------------------------------------------------
     
     % Getting testFunction values -----------------------------------------
-%     [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2);
-    f = @(x,y) cos(x^3 + y^3) + sin(x^2 + y^2) + x + y;
-    [u, v, ux, vx, uy, vy, origin] = testFunction2(X,Y, f);
+    [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2);
+%     f = @(x,y) cos(x^3 + y^3) + sin(x^2 + y^2) + x + y;
+%     f = @(x,y) sin(2*(x-.1))*cos(3*(y+.2));
+%     [u, v, ux, vx, uy, vy, origin] = testFunction2(X,Y,f);
     uxAtO_Exact = ux;
     uyAtO_Exact = uy;
     vxAtO_Exact = vx;
@@ -95,7 +96,8 @@ end
 
 %% Plotting
 figure(1)
-loglog(nn,uxErr,'r.-', nn,uyErr,'b.-', nn,nn.^-2,'b--', nn,nn.^-4,'r--')
+loglog(nn,uxErr,'ro-', nn,uyErr,'bo-', nn,nn.^-2,'b--', nn,nn.^-4,'r--')
+axis tight
 id = legend('u_x','u_y', 'Location','Best');
 set(id, 'FontSize', 12)
 text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
@@ -104,7 +106,8 @@ title('Error on u derivatives', 'FontSize', 14)
 xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
 
 figure(2)
-loglog(nn,vxErr,'r.-', nn,vyErr,'b.-', nn,nn.^-2,'r--', nn,nn.^-4,'b--')
+loglog(nn,vxErr,'ro-', nn,vyErr,'bo-', nn,nn.^-2,'r--', nn,nn.^-4,'b--')
+axis tight
 id = legend('v_x','v_y', 'Location','Best');
 set(id, 'FontSize', 12)
 text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
