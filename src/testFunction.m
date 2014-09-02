@@ -1,39 +1,38 @@
-function [u, v, ux, vx, uy, vy, origin] = testFunction(X,Y,k1,k2,k)
-% Evaluate the test function and it's derivatives
-% INPUT:
-% k : order of the derivative (default = 1)
-% NOTE: Values of the derivatives at the center of the grid.
+%% testFunction
+% Generates a test function that has divergence zero, evaluate it at grid
+% points and calculate its derivatives at some point.
+%
+%  INPUT:
+%  P      : list of points where the test function will be evaluated.
+%  p      : point where we calculate the derivatives of the test function.
+%  k1, k2 : controls the amount of vortex in the test function.
+%
+%  OUTPUT:
+%  u, v   : divergence-free vector field at the points P.
+%  u?, v? : derivatives of the divergence-free vector field at point p.
 
-if (nargin < 5)
-    k = 1;
-end
+%%
+function [u, v, ux, vx, uy, vy] = testFunction(P,p,k1,k2)
 
+%% Defining test function
 sx = 0.1; sy = 0.2; % Shift in X and Y
-% X = X+sx; Y = Y+sy; % Shifted variables
-
 syms x y
 u = @(x,y) +1/k1 * sin(k1*(x - sx)) .* cos(k2*(y - sy));
 v = @(x,y) -1/k2 * cos(k1*(x - sx)) .* sin(k2*(y - sy));
 
-% Calculating derivatives ----------------------------
-ux = matlabFunction(diff(u(x,y), x, k)); ux = ux(X,Y);
-vx = matlabFunction(diff(v(x,y), x, k)); vx = vx(X,Y);
-uy = matlabFunction(diff(u(x,y), y, k)); uy = uy(X,Y);
-vy = matlabFunction(diff(v(x,y), y, k)); vy = vy(X,Y);
-% ----------------------------------------------------
+%% Calculating derivatives
+ux = matlabFunction(diff(u(x,y), x));
+vx = matlabFunction(diff(v(x,y), x));
+uy = matlabFunction(diff(u(x,y), y));
+vy = matlabFunction(diff(v(x,y), y));
 
-% Evaluating derivatives at the origin --------------------------
-gridCenterX = ceil(size(X,2)/2); gridCenterY = ceil(size(Y,1)/2);
-origin = struct('i',gridCenterX,'j',gridCenterY);
-ux = ux(origin.i,origin.j);
-vy = vy(origin.i,origin.j);
-vx = vx(origin.i,origin.j);
-uy = uy(origin.i,origin.j);
-% ux = ux(0,0);
-% vy = vy(0,0);
-% vx = vx(0,0);
-% uy = uy(0,0);
-% ---------------------------------------------------------------
+%% Evaluating derivatives at p
+ux = ux(p(1),p(2));
+vy = vy(p(1),p(2));
+vx = vx(p(1),p(2));
+uy = uy(p(1),p(2));
 
-u = u(X,Y); v = v(X,Y); % Calculating the functions at grid points
+%% Calculating the divergece-free vector field at grid points |P|
+u = u(P(:,1),P(:,2));
+v = v(P(:,1),P(:,2)); 
 end
