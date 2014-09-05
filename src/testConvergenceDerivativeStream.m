@@ -6,25 +6,22 @@ k1 = 3; k2 = 7;  % control the amout of vortices on the testFunction
 
 % Setting up the FD_DivFreeMatrix function:
 N = 5;           % Degree of the bivariate polynomial
-numPts = 3;      % The main stecil will have numPts^2 points
-k = 1;           % Order of the derivative
+p = [0 0];       % Point to measure the error
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
-uxErrFD = []; uyErrFD = []; vxErrFD = []; vyErrFD = []; % Trad diff errors
 
-nn = 11:20:200; % The code only works for n odd, will get non-integer index
+nn = 11:10:200; % The code only works for n odd, will get non-integer index
                 % otherwise
 for n = nn
-    tic
+    n, tic
     
-    % Generating 2d-grid n^2 pts equally-spaced --
-    xx = linspace(-1,1,n);  yy = linspace(-1,1,n);
-    [X, Y] = meshgrid(xx, yy);
-    h = abs(xx(2) - xx(1));
+    % Generating the center grid ------- --
+    dSites = [p; -1+2*rand(n^2-1,2)];
+    dSites = nearstNeighbors(dSites, p, 9);
     % --------------------------------------------
     
     % Getting testFunction values ------------------------------
-    [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2,k);
+    [u, v, ux, vx, uy, vy] = testFunction(dSites, p, k1, k2);
     uxAtO_Exact = ux;
     uyAtO_Exact = uy;
     vxAtO_Exact = vx;
@@ -33,43 +30,22 @@ for n = nn
     
     % Not using extra interpolation points anymore!
     
-    % Selecting points to interpolate ------------------------------
-    uIdx = find(load('uInterpPts.txt') == 1);
-    vIdx = find(load('vInterpPts.txt') == 1); % using linear indexes
-    interpPts = struct('u', uIdx,'v', vIdx, 'numPts',numPts); 
-    % --------------------------------------------------------------
+    % Not using interpPts anymore.
     
-    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrixStream(h,N,interpPts,k);
-    
-%     M = M(h);       % Fix M for the stencil %% MIGHT be useful later on.
-    
-    % Selecting interpolation points of the stencil -----------------------
-    [Iu, Ju] = ind2sub([numPts numPts], uIdx); % Converting linear indexes
-    [Iv, Jv] = ind2sub([numPts numPts], vIdx); % to traditional ones
-    
-    Iu = (Iu-2) + origin.i;
-    Ju = (Ju-2) + origin.j;
-    Iv = (Iv-2) + origin.i;
-    Jv = (Jv-2) + origin.j;
-    % NOTE: this only works for a stencil of 3x3, for now. Need to use
-    % numPts to generalize.
-    U = u(sub2ind([n n], Iu, Ju)); % Converting back to linear 
-    V = v(sub2ind([n n], Iv, Jv)); % indexes for selection issues 
+    [M, t1, t2, ux, uy, vx, vy] = FD_DivFreeMatrixStream(dSites, N);
     % ---------------------------------------------------------------------
-    
-    % No more extra interpolation points code!
-    
-    coeffs = M\[U; V];  % Get polynomial coefficients
+
+    coeffs = M\[u(:); v(:)];  % Get polynomial coefficients
     
     % Numerical derivatives (inefficient code, will replace when we decide 
     % on the format of the interpolant):
     numUnknows = length(coeffs);
-    uxAtO = ux(0,0,coeffs);
-    uyAtO = uy(0,0,coeffs);
-    vxAtO = vx(0,0,coeffs);
-    vyAtO = vy(0,0,coeffs);
-    uAtO = t1(0,0,coeffs);
-    vAtO = t2(0,0,coeffs);
+    uxAtO = ux(p(1),p(2),coeffs);
+    uyAtO = uy(p(1),p(2),coeffs);
+    vxAtO = vx(p(1),p(2),coeffs);
+    vyAtO = vy(p(1),p(2),coeffs);
+    uAtO = t1(p(1),p(2),coeffs);
+    vAtO = t2(p(1),p(2),coeffs);
     % ---------------------------------------------------------------------
     
     % Measuring the error for divFree method -
@@ -79,7 +55,6 @@ for n = nn
     vyErr = [vyErr; abs(vyAtO - vyAtO_Exact)];
     % ----------------------------------------
     toc
-    n
 end
 
 figure(1)

@@ -6,54 +6,31 @@
 clc, clear
 
 k1 = 3; k2 = 7;  % Control the amout of vortices on the testFunction
+p = [0 0];       % Point to measure the error
+nn = 11:10:200;
 
 rbf = @(e,r) exp(-(e*r).^2);
-ep = 3;  % Shape parameter
-
-numPts = 3;   % numPts^2 points in the stencil
-nn = 11:10:400; % Works for n odd only
+ep = 2;  % Shape parameter
 
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 
-RX = rand(3,3);
-RY = rand(3,3);
-ZZ = ones(3);
-ZZ(2,2) = 0;
 %%
-% theta = pi/7;
-theta = 0;
 for n = nn
     n, tic
     
     % Generating the center grid ------------------------------------------
-    x = linspace(-1,1,n);
-    y = linspace(-1,1,n);
-    x = x(-floor(numPts/2) + ceil(n/2) : floor(numPts/2) + ceil(n/2));
-    y = y(-floor(numPts/2) + ceil(n/2) : floor(numPts/2) + ceil(n/2));
-    dx = x(2) - x(1);
-    dy = y(2) - y(1);
-    [X,Y] = meshgrid(x);
-    
-    % Perturbing the points
-    s = 10;
-    X = X - (dx/(2*s) + dx/s*RX).*ZZ;
-    Y = Y - (dy/(2*s) + dy/s*RY).*ZZ;
-    Xnew = X(:)*cos(theta) + Y(:)*sin(theta);
-    Ynew = -X(:)*sin(theta) + Y(:)*cos(theta);
-    X(:) = Xnew;
-    Y(:) = Ynew;
-
-    dSites = [X(:) Y(:)];
+    dSites = [p; -1+2*rand(n^2-1,2)];
+    dSites = nearstNeighbors(dSites, p, 9);
     d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
     d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
     r = DistanceMatrix(dSites, dSites);
     % ---------------------------------------------------------------------
     
     % Getting testFunction values -----------------------------------------
-    [u, v, ux, vx, uy, vy, origin] = testFunction(X, Y, k1, k2);
+    [u, v, ux, vx, uy, vy] = testFunction(dSites, p, k1, k2);
 %     f = @(x,y) cos(x^3 + y^3) + sin(x^2 + y^2) + x + y;
 %     f = @(x,y) sin(2*(x-.1))*cos(3*(y+.2));
-%     [u, v, ux, vx, uy, vy, origin] = testFunction2(X,Y,f);
+%     [u, v, ux, vx, uy, vy] = testFunction2(dSites, p, f);
     uxAtO_Exact = ux;
     uyAtO_Exact = uy;
     vxAtO_Exact = vx;
@@ -68,20 +45,14 @@ for n = nn
     c = reshape(c, 2, size(t,1))';
     % ---------------------------------------------------------------------
     
-    % Getting the derivatives at the origin--------------------------------
+    % Getting the derivatives at p ----------------------------------------
     Dx_t = reshape(Dx*d, 2, size(t,1))';
     Dy_t = reshape(Dy*d, 2, size(t,1))';
     
-    ux = reshape(Dx_t(:,1),size(X));
-    uy = reshape(Dy_t(:,1),size(X));
-    vx = reshape(Dx_t(:,2),size(Y));
-    vy = reshape(Dy_t(:,2),size(Y));
-    
-    gridCenterX = ceil(size(X,2)/2); gridCenterY = ceil(size(Y,1)/2);
-    uxAtO = ux(gridCenterX,gridCenterY);
-    uyAtO = uy(gridCenterX,gridCenterY);
-    vxAtO = vx(gridCenterX,gridCenterY);
-    vyAtO = vy(gridCenterX,gridCenterY);
+    uxAtO = Dx_t(1,1);
+    uyAtO = Dy_t(1,1);
+    vxAtO = Dx_t(1,2);
+    vyAtO = Dy_t(1,2);
     % ---------------------------------------------------------------------
     
     % Measuring the error -------------------------------------------------

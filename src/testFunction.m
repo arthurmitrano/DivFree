@@ -28,9 +28,9 @@ vy = matlabFunction(diff(v(x,y), y));
 
 %% Evaluating derivatives at p
 ux = ux(p(1),p(2));
-vy = vy(p(1),p(2));
-vx = vx(p(1),p(2));
 uy = uy(p(1),p(2));
+vx = vx(p(1),p(2));
+vy = vy(p(1),p(2));
 
 %% Calculating the divergece-free vector field at grid points |P|
 u = u(P(:,1),P(:,2));
