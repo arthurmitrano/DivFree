@@ -2,31 +2,41 @@
 clc
 close all
 
-k1 = 3; k2 = 7;  % control the amout of vortices on the testFunction
+k1 = 7; k2 = 7;  % control the amout of vortices on the testFunction
 
 % Setting up the FD_DivFreeMatrix function:
-N = 5;           % Degree of the bivariate polynomial
-p = [0 0];       % Point to measure the error
-
+N = 3;                % Degree of the bivariate polynomial stream function
+p = [0 0];            % Point to measure the error
+nn = 11:10:500;
+h = zeros(size(nn));  % Distance of the furthest point from p
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
 
-nn = 11:10:200; % The code only works for n odd, will get non-integer index
-                % otherwise
+i = 1;
 for n = nn
     n, tic
     
-    % Generating the center grid ------- --
-    dSites = [p; -1+2*rand(n^2-1,2)];
+    % Generating the center grid ------------------------------------------
+    % Random points -------------------
+    % dSites = [p; -1+2*rand(n^2-1,2)];
+    % ---------------------------------
+
+    % Rectangular grid -----------------
+    [X, Y] = meshgrid(linspace(-1,1,n));
+    dSites = [X(:) Y(:)];
+    % ----------------------------------
+
     dSites = nearstNeighbors(dSites, p, 9);
-    % --------------------------------------------
+    h(i) = max(DistanceMatrix(dSites,p));
+    i = i + 1;
+    % ---------------------------------------------------------------------
     
-    % Getting testFunction values ------------------------------
+    % Getting testFunction values -----------------------------------------
     [u, v, ux, vx, uy, vy] = testFunction(dSites, p, k1, k2);
     uxAtO_Exact = ux;
     uyAtO_Exact = uy;
     vxAtO_Exact = vx;
     vyAtO_Exact = vy;
-    % ----------------------------------------------------------
+    % ---------------------------------------------------------------------
     
     % Not using extra interpolation points anymore!
     
@@ -57,19 +67,27 @@ for n = nn
     toc
 end
 
+%% Plotting
 figure(1)
-loglog(nn,uxErr,'r.-', nn,uyErr,'b.-', nn,nn.^-2,'b--', nn,nn.^-4,'r--')
-id = legend('u_x','u_y', 'Location','Best');
-set(id, 'FontSize', 12)
-text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
-text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
-title('Error on u derivatives', 'FontSize', 14)
-xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
+loglog(h,uxErr,'ro', h,uyErr,'bo', h,h.^2,'b--', h,h.^4,'r--')
+axis tight
+set(gca, 'FontSize', 14)  % Increasing ticks fontsize
+id = legend('$$u_x$$','$$u_y$$', 'Location','Best');
+set(id, 'Interpreter','latex', 'FontSize',18)
+text(h(5), h(7)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize', 18)
+text(h(5), h(6)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize', 18)
+title('Error on $$u$$ derivatives', 'Interpreter','latex', 'FontSize', 18)
+xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
+ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
 figure(2)
-loglog(nn,vxErr,'r.-', nn,vyErr,'b.-', nn,nn.^-2,'r--', nn,nn.^-4,'b--')
-id = legend('v_x','v_y', 'Location','Best');
-text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
-text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
-title('Error on v derivatives', 'FontSize', 14)
-xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
+loglog(h,vxErr,'ro', h,vyErr,'bo', h,h.^2,'r--', h,h.^4,'b--')
+axis tight
+set(gca, 'FontSize', 14)  % Increasing ticks fontsize
+id = legend('$$v_x$$','$$v_y$$', 'Location','Best');
+set(id, 'Interpreter','latex', 'FontSize', 18)
+text(h(5), h(7)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize', 18)
+text(h(5), h(6)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize', 18)
+title('Error on $$v$$ derivatives', 'Interpreter','latex', 'FontSize', 18)
+xlabel('$h$', 'Interpreter','latex', 'FontSize',18)
+ylabel('Error', 'Interpreter','latex', 'FontSize',18)
