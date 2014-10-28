@@ -74,9 +74,9 @@ axis tight
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend('$$u_x$$','$$u_y$$', 'Location','Best');
 set(id, 'Interpreter','latex', 'FontSize',18)
-text(h(5), h(7)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize', 18)
-text(h(5), h(6)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize', 18)
-title('Error on $$u$$ derivatives', 'Interpreter','latex', 'FontSize', 18)
+text(h(5), h(7)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize',18)
+text(h(5), h(6)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize',18)
+title('Error on $$u$$ derivatives', 'Interpreter','latex', 'FontSize',20)
 xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
 ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
@@ -86,8 +86,8 @@ axis tight
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend('$$v_x$$','$$v_y$$', 'Location','Best');
 set(id, 'Interpreter','latex', 'FontSize', 18)
-text(h(5), h(7)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize', 18)
-text(h(5), h(6)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize', 18)
-title('Error on $$v$$ derivatives', 'Interpreter','latex', 'FontSize', 18)
+text(h(5), h(7)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize',18)
+text(h(5), h(6)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize',18)
+title('Error on $$v$$ derivatives', 'Interpreter','latex', 'FontSize',20)
 xlabel('$h$', 'Interpreter','latex', 'FontSize',18)
 ylabel('Error', 'Interpreter','latex', 'FontSize',18)
