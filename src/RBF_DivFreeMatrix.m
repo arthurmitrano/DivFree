@@ -3,11 +3,12 @@
 % and return the divergence-free RBF differentiation matrices (Dx and Dy).
 %
 %  INPUT:
-%  r    : distance matrix
-%  d1   : difference matrix on the first coordinate (x?)
-%  d2   : difference matrix on the second coordinate (y?)
-%  rbf  : annonymous rbf function
-%  e    : rbf shape parameter
+%  r       : distance matrix
+%  d1      : difference matrix on the first coordinate (x?)
+%  d2      : difference matrix on the second coordinate (y?)
+%  rbf     : annonymous rbf function
+%  e       : rbf shape parameter
+%  calcAep : calculate symbolic matrix Aep
 %
 %  OUTPUT:
 %  A      : interpolation matrix. Invert to find interpolant coeffs
@@ -17,12 +18,17 @@
 %  Aep    : interpolation matrix depending on the shape parameter
 
 %%
-function [A, F, G, Aep, Dx, Dy] = RBF_DivFreeMatrix(r, d1, d2, rbf, e)
+function [A, F, G, Aep, Ax, Ay] = RBF_DivFreeMatrix(r, d1, d2, rbf, e, ...
+                                                    calcAep)
 
 %% Setting up the function
 n = size(r,1); % number of interpolation points
 [F, G, dF, dG] = FandG(rbf);
-if nargout >= 4
+if nargin < 6
+    calcAep = false;
+end
+
+if calcAep
     syms ep
 else
     ep = e;
@@ -42,12 +48,14 @@ A(1:2:2*n, 2:2:2*n) = A12;
 A(2:2:2*n, 1:2:2*n) = A12;
 A(2:2:2*n, 2:2:2*n) = A22;
 
-if nargout >= 4
+if calcAep
     Aep = matlabFunction(A);
     A = Aep(e);
+else
+    Aep = [];
 end
 
-%% Creating differentiation matrices Dx and Dy
+%% Creating support matrices Ax and Ay to calculate Dx and Dy
 if nargout > 4
     r0 = r + eye(size(r)); % To avoid division by zero.
 
@@ -60,12 +68,12 @@ if nargout > 4
     A12 = temp3 .* d1 + G(e,r) .* d2;
     % A21 = A12;
 
+    Ax = zeros(2*n,2*n);
     Ax(1:2:2*n, 1:2:2*n) = A11;
     Ax(1:2:2*n, 2:2:2*n) = A12;
     Ax(2:2:2*n, 1:2:2*n) = A12;
     Ax(2:2:2*n, 2:2:2*n) = A22;
 
-    Dx = Ax/A;  % Differentiate in respect to x
 end
 
 if nargout > 5
@@ -73,19 +81,16 @@ if nargout > 5
     A22 = d2 .* temp2;
     A12 = temp3 .* d2 + G(e,r) .* d1;
     % A21 = A12;
-    % H1 = reshape([A11(:) A12(:)].', 2*n, n).';
-    % H2 = reshape([A12(:) A22(:)].', 2*n, n).';
-    % Ay = reshape([H1 H2].', 2*n, 2*n);
+
     Ay = zeros(2*n,2*n);
     Ay(1:2:2*n, 1:2:2*n) = A11;
     Ay(1:2:2*n, 2:2:2*n) = A12;
     Ay(2:2:2*n, 1:2:2*n) = A12;
     Ay(2:2:2*n, 2:2:2*n) = A22;
 
-    Dy = Ay/A;  % Differentiate in respect to y
 end
 
-% NOTE: The matrices A11, A22, A12, H1, H2 and the temp variables are not
+% NOTE: The matrices A11, A22, A12, and the temp variables are not
 % important. They are used just for calculations.
 
 end
