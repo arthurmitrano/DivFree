@@ -6,10 +6,12 @@
 %% Setting up the script
 clc, clear
 
-e = 2;  % Shape parameter
+p = [0 0 0];          % Point to measure the error
+ep = 3;               % Shape parameter
+nn = 11:10:200;       % Points on the unit cube
+rbf = @(e,r) exp(-(e*r).^2);
 
-numPts = 3;   % numPts^2 points in the stencil
-nn = 11:10:200; % Works for n odd only
+h = zeros(size(nn));  % Fill distance vector
 
 % Derivatives approximation -----------------
 DuAtO = struct('x',{[]}, 'y',{[]}, 'z',{[]});
@@ -23,28 +25,23 @@ DvErr = struct('x',{[]}, 'y',{[]}, 'z',{[]});
 DwErr = struct('x',{[]}, 'y',{[]}, 'z',{[]});
 % -------------------------------------------
 
+%%
+i = 1;
 for n = nn
     n, tic
     % Generating the center grid ------------------------------------------
-    x = linspace(-1,1,n);
-    h = x(2) - x(1);
-    x = x(-floor(numPts/2) + ceil(n/2) : floor(numPts/2) + ceil(n/2));
-    [X,Y,Z] = meshgrid(x);
-    
-    % Perturbing the points
-%     s = 2;
-%     X = X - (h/(2*s) + h/s*RX).*ZZ;
-%     Y = Y - (h/(2*s) + h/s*RY).*ZZ;
-%     Xnew = X(:)*cos(theta) + Y(:)*sin(theta);
-%     Ynew = -X(:)*sin(theta) + Y(:)*cos(theta);
-%     X(:) = Xnew;
-%     Y(:) = Ynew;
+    [X, Y, Z] = meshgrid(linspace(-1,1,n));
 
     dSites = [X(:) Y(:) Z(:)];
+    dSites = nearstNeighbors(dSites, p, 27);
+
     d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
     d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
     d3 = DifferenceMatrix(dSites(:,3), dSites(:,3));
     r = DistanceMatrix(dSites, dSites);
+    R = r.*(diag(inf*ones(size(r,1),1)) + ones(size(r)));
+    h(i) = min(max(R));
+    i = i + 1;
     % ---------------------------------------------------------------------
     
     % Getting testFunction values -----------------------------------------
@@ -52,12 +49,12 @@ for n = nn
     F2 = @(x,y,z) cos((x-.5).^2 + (y-.5).^2 + (z-.5).^2);
     F3 = @(x,y,z) tanh((x+.5).^2 + (y-1).^2 + (z+1).^2);
     
-    [u, v, w, Du, Dv, Dw, O] = testFunction3d(X,Y,Z, F1,F2,F3);
+    [u, v, w, Du, Dv, Dw] = testFunction3d(dSites, p, F1,F2,F3);
     t = [u(:) v(:) w(:)];
     % ---------------------------------------------------------------------
     
     % Calculating interpolation matrix and its derivatives matrices -------
-    [A, Ax, Ay, Az] = rbfDivFreeMatrix3d(r, d1, d2, d3, e);
+    [A, Ax, Ay, Az] = rbfDivFreeMatrix3d(r, d1, d2, d3, ep);
     d = [u(:); v(:); w(:)];
     c = A\d;
     % ---------------------------------------------------------------------
@@ -65,37 +62,25 @@ for n = nn
     % Calculating x-derivatives ---------
     d_x = Ax*c;
     t_x = reshape(d_x, size(t,1), 3);
-    DuAtO.x = reshape(t_x(:,1), size(X));
-    DvAtO.x = reshape(t_x(:,2), size(X));
-    DwAtO.x = reshape(t_x(:,3), size(X));
-    
-    DuAtO.x = DuAtO.x(O.i,O.j,O.k);
-    DvAtO.x = DvAtO.x(O.i,O.j,O.k);
-    DwAtO.x = DwAtO.x(O.i,O.j,O.k);
+    DuAtO.x = t_x(1,1);
+    DvAtO.x = t_x(1,2);
+    DwAtO.x = t_x(1,3);
     % -----------------------------------
     
     % Calculating y-derivatives ---------
     d_y = Ay*c;
     t_y = reshape(d_y, size(t,1), 3);
-    DuAtO.y = reshape(t_y(:,1), size(X));
-    DvAtO.y = reshape(t_y(:,2), size(X));
-    DwAtO.y = reshape(t_y(:,3), size(X));
-    
-    DuAtO.y = DuAtO.y(O.i,O.j,O.k);
-    DvAtO.y = DvAtO.y(O.i,O.j,O.k);
-    DwAtO.y = DwAtO.y(O.i,O.j,O.k);
+    DuAtO.y = t_y(1,1);
+    DvAtO.y = t_y(1,2);
+    DwAtO.y = t_y(1,3);
     % -----------------------------------
     
     % Calculating z-derivatives ---------
     d_z = Az*c;
     t_z = reshape(d_z, size(t,1), 3);
-    DuAtO.z = reshape(t_z(:,1), size(X));
-    DvAtO.z = reshape(t_z(:,2), size(X));
-    DwAtO.z = reshape(t_z(:,3), size(X));
-    
-    DuAtO.z = DuAtO.z(O.i,O.j,O.k);
-    DvAtO.z = DvAtO.z(O.i,O.j,O.k);
-    DwAtO.z = DwAtO.z(O.i,O.j,O.k);
+    DuAtO.z = t_z(1,1);
+    DvAtO.z = t_z(1,2);
+    DwAtO.z = t_z(1,3);
     % -----------------------------------
     
     % Measuring the errors ------------------
@@ -114,36 +99,98 @@ for n = nn
     toc
 end
 
+%% Sorting the error vectors for plotting
+[h, I] = sort(h);
+DuErr.x = DuErr.x(I);
+DuErr.y = DuErr.y(I);
+DuErr.z = DuErr.z(I);
+
+DvErr.x = DvErr.x(I);
+DvErr.y = DvErr.y(I);
+DvErr.z = DvErr.z(I);
+
+DwErr.x = DwErr.x(I);
+DwErr.y = DwErr.y(I);
+DwErr.z = DwErr.z(I);
+
+%% Rate of decay
+p_ux = polyfit(log10(h'),log10(DuErr.x),1);
+p_uy = polyfit(log10(h'),log10(DuErr.y),1);
+p_uz = polyfit(log10(h'),log10(DuErr.z),1);
+p_vx = polyfit(log10(h'),log10(DvErr.x),1);
+p_vy = polyfit(log10(h'),log10(DvErr.y),1);
+p_vz = polyfit(log10(h'),log10(DvErr.z),1);
+p_wx = polyfit(log10(h'),log10(DwErr.x),1);
+p_wy = polyfit(log10(h'),log10(DwErr.y),1);
+p_wz = polyfit(log10(h'),log10(DwErr.z),1);
+
+
+fprintf('Rate of decay for ux: h^(%f)\n', p_ux(1))
+fprintf('Rate of decay for uy: h^(%f)\n', p_uy(1))
+fprintf('Rate of decay for uz: h^(%f)\n', p_uz(1))
+fprintf('Rate of decay for vx: h^(%f)\n', p_vx(1))
+fprintf('Rate of decay for vy: h^(%f)\n', p_vy(1))
+fprintf('Rate of decay for vz: h^(%f)\n', p_vz(1))
+fprintf('Rate of decay for wx: h^(%f)\n', p_wx(1))
+fprintf('Rate of decay for wy: h^(%f)\n', p_wy(1))
+fprintf('Rate of decay for wz: h^(%f)\n', p_wz(1))
+
 %% Plotting
+k = floor(length(nn)*(.9));  % index to place h^2 and h^4 on the plot
+
 figure(1)
-loglog(nn,DuErr.x,'ro-', nn,DuErr.y,'bo-', nn,DuErr.z,'k.-', ...
-       nn,nn.^-2,'c--', nn,nn.^-4,'m--')
+loglog(h,DuErr.x,'ro', h,DuErr.y,'bo', h,DuErr.z,'ko', ...
+       h,h.^2,'c--', h,h.^4,'m--')
 axis tight
-id = legend('u_x','u_y','u_z', 'Location','Best');
-set(id, 'FontSize',12)
-text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
-text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
-title('Error on u derivatives', 'FontSize', 14)
-xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
+set(gca, 'FontSize', 14)  % Increasing ticks fontsize
+id = legend(['$$u_x$$: $$h^{', num2str(p_ux(1),3), '}$$'], ...
+            ['$$u_y$$: $$h^{', num2str(p_uy(1),3), '}$$'], ...
+            ['$$u_z$$: $$h^{', num2str(p_uz(1),3), '}$$'], ...
+            'Location','Best');
+set(id, 'Interpreter','latex', 'FontSize',18)
+text(h(k), h(k)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize',18, ...
+     'EdgeColor','cyan', 'BackgroundColor','white', 'color','cyan')
+text(h(k), h(k)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize',18, ...
+     'EdgeColor','magenta', 'BackgroundColor','white', 'color','magenta')
+title('Error on $$u$$ derivatives: RBF-FD', 'Interpreter','latex', ...
+      'FontSize',20)
+xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
+ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
 figure(2)
-loglog(nn,DvErr.x,'ro-', nn,DvErr.y,'bo-', nn,DvErr.z,'k.-', ...
-       nn,nn.^-2,'c--', nn,nn.^-4,'m--')
+loglog(h,DvErr.x,'ro', h,DvErr.y,'bo', h,DvErr.z,'ko', ...
+       h,h.^2,'c--', h,h.^4,'m--')
 axis tight
-id = legend('v_x','v_y','v_z', 'Location','Best');
-set(id, 'FontSize',12)
-text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
-text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
-title('Error on v derivatives', 'FontSize', 14)
-xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
+set(gca, 'FontSize', 14)  % Increasing ticks fontsize
+id = legend(['$$v_x$$: $$h^{', num2str(p_vx(1),3), '}$$'], ...
+            ['$$v_y$$: $$h^{', num2str(p_vy(1),3), '}$$'], ...
+            ['$$v_z$$: $$h^{', num2str(p_vz(1),3), '}$$'], ...
+            'Location','Best');
+set(id, 'Interpreter','latex', 'FontSize',18)
+text(h(k), h(k)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize',18, ...
+     'EdgeColor','cyan', 'BackgroundColor','white', 'color','cyan')
+text(h(k), h(k)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize',18, ...
+     'EdgeColor','magenta', 'BackgroundColor','white', 'color','magenta')
+title('Error on $$v$$ derivatives: RBF-FD', 'Interpreter','latex', ...
+      'FontSize',20)
+xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
+ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
 figure(3)
-loglog(nn,DwErr.x,'ro-', nn,DwErr.y,'bo-', nn,DwErr.z,'k.-', ...
-       nn,nn.^-2,'c--', nn,nn.^-4,'m--')
+loglog(h,DwErr.x,'ro', h,DwErr.y,'bo', h,DwErr.z,'ko', ...
+       h,h.^2,'c--', h,h.^4,'m--')
 axis tight
-id = legend('w_x','w_y','w_z', 'Location','Best');
-set(id, 'FontSize',12)
-text(nn(5), nn(5)^-2, 'N^{-2}', 'FontSize', 12, 'FontWeight', 'bold')
-text(nn(5), nn(5)^-4, 'N^{-4}', 'FontSize', 12, 'FontWeight', 'bold')
-title('Error on w derivatives', 'FontSize', 14)
-xlabel('N', 'FontSize', 12), ylabel('Error', 'FontSize', 12)
+set(gca, 'FontSize', 14)  % Increasing ticks fontsize
+id = legend(['$$w_x$$: $$h^{', num2str(p_wx(1),3), '}$$'], ...
+            ['$$w_y$$: $$h^{', num2str(p_wy(1),3), '}$$'], ...
+            ['$$w_z$$: $$h^{', num2str(p_wz(1),3), '}$$'], ...
+            'Location','Best');
+set(id, 'Interpreter','latex', 'FontSize',18)
+text(h(k), h(k)^2, '$$h^{2}$$', 'Interpreter','latex', 'FontSize',18, ...
+     'EdgeColor','cyan', 'BackgroundColor','white', 'color','cyan')
+text(h(k), h(k)^4, '$$h^{4}$$', 'Interpreter','latex', 'FontSize',18, ...
+     'EdgeColor','magenta', 'BackgroundColor','white', 'color','magenta')
+title('Error on $$w$$ derivatives: RBF-FD', 'Interpreter','latex', ...
+      'FontSize',20)
+xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
+ylabel('Error', 'Interpreter','latex', 'FontSize',18)
