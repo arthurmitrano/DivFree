@@ -2,9 +2,9 @@
 clc, clear
 
 k1 = 7; k2 = 7;     % control the amout of vortices on the testFunction
-N = 3;              % Degree of the bivariate polynomial stream function
+N = 5;              % Degree of the bivariate polynomial stream function
 p = [0 0];          % Point to measure the error
-randomGrid = false;  % Use a random grid
+randomGrid = true;  % Use a random grid
 nn = 11:10:500;
 
 h = zeros(size(nn));  % Fill distance
@@ -26,7 +26,9 @@ for n = nn
         % ----------------------------------
     end
     dSites = nearstNeighbors(dSites, p, 9);
-    h(i) = max(DistanceMatrix(dSites,p));
+    r = DistanceMatrix(dSites, dSites);
+    R = r.*(diag(inf*ones(size(r,1),1)) + ones(size(r)));
+    h(i) = min(max(R));
     i = i + 1;
     % ---------------------------------------------------------------------
     
