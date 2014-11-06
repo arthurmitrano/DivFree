@@ -21,16 +21,18 @@ u = @(x,y) +1/k1 * sin(k1*(x - sx)) .* cos(k2*(y - sy));
 v = @(x,y) -1/k2 * cos(k1*(x - sx)) .* sin(k2*(y - sy));
 
 %% Calculating derivatives
-ux = matlabFunction(diff(u(x,y), x));
-vx = matlabFunction(diff(v(x,y), x));
-uy = matlabFunction(diff(u(x,y), y));
-vy = matlabFunction(diff(v(x,y), y));
+if nargout > 2
+    ux = matlabFunction(diff(u(x,y), x));
+    vx = matlabFunction(diff(v(x,y), x));
+    uy = matlabFunction(diff(u(x,y), y));
+    vy = matlabFunction(diff(v(x,y), y));
 
-%% Evaluating derivatives at p
-ux = ux(p(1),p(2));
-uy = uy(p(1),p(2));
-vx = vx(p(1),p(2));
-vy = vy(p(1),p(2));
+    % Evaluating derivatives at p
+    ux = ux(p(1),p(2));
+    uy = uy(p(1),p(2));
+    vx = vx(p(1),p(2));
+    vy = vy(p(1),p(2));
+end
 
 %% Calculating the divergece-free vector field at grid points P
 u = u(P(:,1),P(:,2));

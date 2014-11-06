@@ -25,18 +25,20 @@ u = diff(F(x,y),y);
 v = diff(-F(x,y),x);
 
 %% Calculating derivatives
-ux = matlabFunction(diff(u,x), 'vars',[x,y]);
-uy = matlabFunction(diff(u,y), 'vars',[x,y]);
-vx = matlabFunction(diff(v,x), 'vars',[x,y]);
-vy = matlabFunction(diff(v,y), 'vars',[x,y]);
+if nargout > 2
+    ux = matlabFunction(diff(u,x), 'vars',[x,y]);
+    uy = matlabFunction(diff(u,y), 'vars',[x,y]);
+    vx = matlabFunction(diff(v,x), 'vars',[x,y]);
+    vy = matlabFunction(diff(v,y), 'vars',[x,y]);
 
-%% Evaluating derivatives at |p|
-ux = ux(p(1),p(2));
-vy = vy(p(1),p(2));
-vx = vx(p(1),p(2));
-uy = uy(p(1),p(2));
+    % Evaluating derivatives at p
+    ux = ux(p(1),p(2));
+    vy = vy(p(1),p(2));
+    vx = vx(p(1),p(2));
+    uy = uy(p(1),p(2));
+end
 
-%% Calculating the divergece-free vector field at grid points |P|
+%% Calculating the divergece-free vector field at grid points P
 u = matlabFunction(u, 'vars',[x,y]);
 v = matlabFunction(v, 'vars',[x,y]);
 u = u(P(:,1),P(:,2));
