@@ -19,15 +19,19 @@ j = 1;
 for ep = shapeParameters
     i = 1;
     for n = totalPoints
+        fprintf('ep = %f, n = %i\n', ep, n)
+        tic
         constRBF(i,j) = lebesgueFunctionsRBF(n, false, ep, rbf);
         i = i + 1;
+        toc
     end
-    legends(j) = {['\epsilon = ', num2str(ep)]};
+    legends(j) = {['$\varepsilon = ', num2str(ep), '$']};
     j = j + 1;
 end
 
 %% Plotting the Lebesgue constants for the RBF interpolant
 figure(1)
+set(gcf, 'Position', [100,100, 800, 500])
 semilogy(totalPoints,constRBF,'.-', 'MarkerSize',12)
 hold on
 
@@ -43,19 +47,27 @@ constPoly = zeros(length(totalPoints),1);
 
 i = 1;
 for n = totalPoints
-%     constPoly(i) = lebesgueFunctions(n,n+4);
+    fprintf('n = %i\n',n)
+    tic
+    constPoly(i) = lebesgueFunctions(n,n+4);
+
     % Testing for points close to Chebyshev points
-    constPoly(i) = lebesgueFunctions(n,n+4,n,false,0.001);
+    % constPoly(i) = lebesgueFunctions(n,n+4,n,false,0.001);
     i = i + 1;
+    toc
 end
 
 %% Plotting the Lebesgue constant for the polynomial interpolant
 semilogy(totalPoints,constPoly,'.--k', 'MarkerSize',12)
+axis tight
+set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 legends(end) = {'polynomial'};
-title('RBF vs Polynomial divergence-free interpolants')
-xlabel('$\sqrt{N}$','Interpreter','latex')
-ylabel('Lebesgue constant')
-legend(legends, 'Location','NorthWest')
+title('RBF vs Polynomial divergence-free interpolants', ...
+      'Interpreter','latex', 'FontSize',20)
+xlabel('$\sqrt{N}$', 'Interpreter','latex', 'FontSize',18)
+ylabel('Lebesgue constant', 'Interpreter','latex', 'FontSize',18)
+id = legend(legends, 'Location','Best');
+set(id, 'Interpreter','latex', 'FontSize',18)
 hold off
 
 %%
@@ -84,7 +96,7 @@ for ep = shapeParameters
     i = 1;
     for n = totalPoints
         [a, L] = fminbnd(@(alpha) lebesgueFunctionsRBF(n, false, ep, ...
-                                  rbf, alpha), 0.1, 1);
+                                  rbf, alpha), 0, 1);
         alphasRBF(i,j) = a;
         minConstRBF(i,j) = L;
         
@@ -101,13 +113,13 @@ display('alphasRBF')
 printmat(alphasRBF,'N\e', rows, columns)
 
 %% Optimizing node this distribution for polynomial interpolant
-display('Optimizing node distribution for RBF interpolant')
+display('Optimizing node distribution for polynomial interpolant')
 minConstPoly = zeros(length(totalPoints),1);
 alphasPoly = zeros(length(totalPoints),1);
 
 i = 1;
 for n = totalPoints
-    [a, L] = fminbnd(@(alpha) lebesgueFunctions(n,n+4,n,false,alpha), 0,1);
+    [a, L] = fminbnd(@(alpha) lebesgueFunctions(n,n+4,false,alpha), 0,1);
     alphasPoly(i) = a;
     minConstPoly(i) = L;
     i = i + 1;
