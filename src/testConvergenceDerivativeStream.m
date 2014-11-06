@@ -28,7 +28,7 @@ for n = nn
     dSites = nearstNeighbors(dSites, p, 9);
     r = DistanceMatrix(dSites, dSites);
     R = r.*(diag(inf*ones(size(r,1),1)) + ones(size(r)));
-    h(i) = min(max(R));
+    h(i) = max(min(R));
     i = i + 1;
     % ---------------------------------------------------------------------
     

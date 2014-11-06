@@ -1,6 +1,10 @@
 %% Divergence-free RBF-FD derivatives test
 % In this script we test the convergence rate of the derivatives using
 % the divergence-free RBF-FD method.
+%
+% This script also works to measure global divergence-free RBF method, just
+% change the amount of points that are selected to calculate the
+% approximation to be all the points of the stencil.
 
 %% Setting up the script
 clc, clear
@@ -9,7 +13,7 @@ k1 = 7; k2 = 7;       % Control the amout of vortices on the testFunction
 p = [0 0];            % Point to measure the error
 ep = 2;               % Shape parameter
 randomGrid = false;    % Use a random grid
-nn = 11:10:500;       % Points on the unit square
+nn = 11:2:300;       % Points on the unit square
 rbf = @(e,r) exp(-(e*r).^2);
 
 h = zeros(size(nn));  % Fill distance vector
@@ -38,7 +42,7 @@ for n = nn
     d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
     r = DistanceMatrix(dSites, dSites);
     R = r.*(diag(inf*ones(size(r,1),1)) + ones(size(r)));
-    h(i) = min(max(R));
+    h(i) = max(min(R));
     i = i + 1;
     % ---------------------------------------------------------------------
     
