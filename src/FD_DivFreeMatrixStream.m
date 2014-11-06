@@ -72,13 +72,13 @@ v = matlabFunction(v,'vars',[x y]);
 %   V
 % \end{array} \right] * \tt{coeffs} = \left[
 % \begin{array}{c}
-%   f_u(dSites) \\
-%   f_v(dSites)
+%   f_u(\tt{dSites}) \\
+%   f_v(\tt{dSites})
 % \end{array}\right],
 % $$
 %
-% where the matrices $U = [u(dSites)]$ and $V = [v(dSites)]$ and, dSites is
-% the list of interpolation points.
+% where the matrices $U = [u(\tt{dSites})]$ and $V = [v(\tt{dSites})]$ and,
+% |dSites| is the list of interpolation points.
 
 % There are (N+1)^2 - 1 coeffs at most
 U = zeros(n, length(S));
