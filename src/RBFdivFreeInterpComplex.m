@@ -23,20 +23,17 @@ interp = struct('u', {{}}, 'v', {{}});
 interp.u = cell(size(ep));
 interp.v = cell(size(ep));
 
+h = waitbar(0,'Running RBFdivFreeInterpComplex function', ...
+            'Name','Please wait ...');
+totalIterations = numel(ep);
 for i = 1:size(ep,1)
     for j = 1:size(ep,2)
-%         tic
         coeffs = Aep(ep(i,j))\d;
-%         disp('rank')
-%         rank(Aep(ep(i,j)))
-%         disp('cond')
-%         cond(Aep(ep(i,j)))
         coeffs = reshape(coeffs, 2, numel(d)/2).';
         t = RBFdivFreeInterp(coeffs, r, d1, d2, F, G, ep(i,j));
         interp.u{i,j} = t(:,1);
         interp.v{i,j} = t(:,2);
-%         disp(['i = ' num2str(i) ', j = ' num2str(j)])
-%         toc
+        waitbar(((i-1)*size(ep,2) + (j))/totalIterations, h)
     end
 end
 end
