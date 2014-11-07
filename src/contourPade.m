@@ -6,7 +6,7 @@
 
 %% Setting up the script
 clear, clc
-n = 9;      % sqrt root of number of data sites
+n = 7;      % sqrt root of number of data sites
 
 % rbf = @(ep,r) exp(-(ep*r).^2);
 rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;  % beta = 2
@@ -46,7 +46,7 @@ ePoints = [XX(:) YY(:)]; % evaluation points
 r = DistanceMatrix(dSites, dSites);
 d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
-[~, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2); %Just for Aep
+[~, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2, true); %Just for Aep
 
 % U = [0 0 0; 0 1 0; 0 0 0];
 center = ceil(n/2);
@@ -84,27 +84,30 @@ if (size(ePoints,1) == 1)
     
     subplot(1,2,1)
     contour(epX,epY,abs(interpPlotU), (0:100))
-%     mesh(epX,epY,abs(interpPlotU))
+    set(gca, 'FontSize', 14)  % Increasing ticks fontsize
     zlim([0 10])
     title(['$U^\varepsilon(' num2str(ePoints(1,1)) ', ' ...
            num2str(ePoints(1,2)) ')$ with $\sqrt{N}$ = ' num2str(n)], ...
-           'Interpreter','latex', 'FontSize', 15)
-    xlabel('\Re', 'FontSize',13), ylabel('\Im', 'FontSize',13)
+           'Interpreter','latex', 'FontSize', 20)
+    xlabel('$\Re$', 'Interpreter','latex', 'FontSize',18)
+    ylabel('$\Im$', 'Interpreter','latex', 'FontSize',18)
     hold on
     plot(rho*cos(s)+e0,rho*sin(s),'k--','LineWidth',2)
-    plot([0 0], [-1 1]/(2*sqrt(2)),'m*','MarkerSize',10)
+    plot([0 0], [-1 1]/(2*sqrt(2)),'m.','MarkerSize',14)
     axis square
     hold off
     
     subplot(1,2,2)
     contour(epX,epY,abs(interpPlotV), (0:100))
+    set(gca, 'FontSize', 14)  % Increasing ticks fontsize
     title(['$V^\varepsilon(' num2str(ePoints(1,1)) ', ' ...
            num2str(ePoints(1,2)) ')$ with $\sqrt{N}$ = ' num2str(n)], ...
-           'Interpreter','latex', 'FontSize', 15)
-    xlabel('\Re', 'FontSize',13), ylabel('\Im', 'FontSize',13)
+           'Interpreter','latex', 'FontSize', 20)
+    xlabel('$\Re$', 'Interpreter','latex', 'FontSize',18)
+    ylabel('$\Im$', 'Interpreter','latex', 'FontSize',18)
     hold on
     plot(rho*cos(s)+e0,rho*sin(s),'k--','LineWidth',2)
-    plot([0 0], [-1 1]/(2*sqrt(2)),'m*','MarkerSize',10)
+    plot([0 0], [-1 1]/(2*sqrt(2)),'m.','MarkerSize',14)
     axis square
     hold off
 end
@@ -120,16 +123,20 @@ if (size(ep,1) == 1) || (size(ep,2) == 1)
     
     h1 = subplot(1,2,1);
     mesh(XX,YY,real(interpUatEps0))
-    title(['interpolant of U at \epsilon = ' num2str(e0), ', \rho = ' ...
-            num2str(rho,'%2.2e')])
-    xlabel('x'), ylabel('y')
+    title(['Interpolant of $u$ at $\epsilon = ' num2str(e0), ...
+           '$, $\rho = ', num2str(rho,'%2.2e'), '$'], ...
+           'Interpreter','latex', 'FontSize',20)
+    xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+    ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
     zlim([-.5 1])
     
     h2 = subplot(1,2,2);
     mesh(XX,YY,real(interpVatEps0))
-    title(['interpolant of V at \epsilon = ' num2str(e0), ', \rho = ' ...
-            num2str(rho,'%2.2e')])
-    xlabel('x'), ylabel('y')
+    title(['Interpolant of $v$ at $\epsilon = ' num2str(e0), ...
+           '$, $\rho = ', num2str(rho,'%2.2e'), '$'], ...
+           'Interpreter','latex', 'FontSize',20)
+    xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+    ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
     zlim([-.5 1])
     
     set([h1 h2], 'clim', [-.5 1])
