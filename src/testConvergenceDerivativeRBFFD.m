@@ -10,7 +10,7 @@
 clc, clear
 
 k1 = 7; k2 = 7;       % Control the amout of vortices on the testFunction
-p = [0 0];            % Point to measure the error
+p = [0 0];            % Point to measure the error on the derivatives
 ep = 2;               % Shape parameter
 randomGrid = false;    % Use a random grid
 nn = 11:2:300;       % Points on the unit square
@@ -24,7 +24,7 @@ i = 1;
 for n = nn
     n, tic
     
-    % Generating the center grid ------------------------------------------
+    % Generating the centered grid ----------------------------------------
     if randomGrid
         % Random points -------------------
         dSites = [p; -1+2*rand(n^2-1,2)];
@@ -35,7 +35,6 @@ for n = nn
         dSites = [X(:) Y(:)];
         % ----------------------------------
     end
-
     dSites = nearstNeighbors(dSites, p, 9);
 
     d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));

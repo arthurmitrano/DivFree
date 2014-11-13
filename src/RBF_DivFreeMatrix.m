@@ -1,6 +1,8 @@
 %% RBF_DivFreeMatrix
-% Construct the interpolation matrix *A* for the RBF divFree interpolant
-% and return the divergence-free RBF differentiation matrices (Dx and Dy).
+% Construct the interpolation matrix *$A$* for the RBF *divFree*
+% interpolant and return divergence-free RBF differentiation matrices
+% assistants ($A_x$ and $A_y$), where $D_x = A_x*A^{-1}$ and $D_y =
+% A_y*A^{-1}$.
 %
 %  INPUT:
 %  r       : distance matrix
@@ -12,7 +14,7 @@
 %
 %  OUTPUT:
 %  A      : interpolation matrix. Invert to find interpolant coeffs
-%  Dx, Dy : divergence-free RBF differentiation matrices
+%  Ax, Ay : divergence-free RBF differentiation matrices
 %  F, G   : functions used to create the kernel and evaluate the
 %           interpolant
 %  Aep    : interpolation matrix depending on the shape parameter
