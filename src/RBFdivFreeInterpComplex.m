@@ -36,4 +36,5 @@ for i = 1:size(ep,1)
         waitbar(((i-1)*size(ep,2) + (j))/totalIterations, h)
     end
 end
+close(h)
 end
