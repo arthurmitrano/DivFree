@@ -182,7 +182,7 @@ end
 
 disp('5 interpolation points')
 
-U = [0 1 0 0 0];
+U = [1 0 0 0 0];
 V = [0 0 0 0 0];
 t = [U(:) V(:)];
 d = reshape(t.',1,numel(t)).';
@@ -243,16 +243,22 @@ if takeLimit
 end
 toc
 
-% t1 = matlabFunction(t(1));
-% t2 = matlabFunction(t(2));
-% 
-% figure(1)
-% 
-% subplot(1,2,1)
-% mesh(xx,yy,t1(xx,yy,e))
-% title('U'), xlabel('x'), ylabel('y')
-% 
-% subplot(1,2,2)
-% mesh(xx,yy,t2(xx,yy,e))
-% title('V'), xlabel('x'), ylabel('y')
-% snapnow
+%% Plotting
+t1 = matlabFunction(t(1));
+t2 = matlabFunction(t(2));
+[xx, yy] = meshgrid(linspace(-1,1,200));
+
+figure(1)
+
+subplot(1,2,1)
+mesh(xx,yy,t1(xx,yy,e))
+title('$u$', 'Interpreter','latex', 'FontSize',20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
+
+subplot(1,2,2)
+mesh(xx,yy,t2(xx,yy,e))
+title('$v$', 'Interpreter','latex', 'FontSize',20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
+snapnow

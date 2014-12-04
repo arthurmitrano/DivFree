@@ -8,12 +8,12 @@
 % Calculates Lebesgue function and its constant. The function uses an
 % equispaced grid in x- and y-direction.
 %
-% n       : Number of points in x- and y-direction
-% display : displays the cardinal function (optional, default = false)
-% ep      : Shape parameter (optional, default = 2)
-% rbf     : Radial basis function (optional,
-%                                  default = @(ep,r) exp(-(ep*r).^2) )
-% alpha   : Parameter for the Kosloff & Tal-Ezer mapping (default = 1);
+%  n       : Number of points in x- and y-direction
+%  display : displays the cardinal function (optional, default = false)
+%  ep      : Shape parameter (optional, default = 2)
+%  rbf     : Radial basis function (optional,
+%                                   default = @(ep,r) exp(-(ep*r).^2) )
+%  alpha   : Parameter for the Kosloff & Tal-Ezer mapping (default = 1);
 
 %%
 function lebesgueConst = lebesgueFunctionsRBF(n, display, ep, rbf, alpha)
@@ -99,25 +99,26 @@ for p = 1:2*n^2  % all interpolation points
     [i,j] = ind2sub([n, n], rem(p-1,n^2) + 1);
     if display
         figure(1)
-        % set(gcf, 'Position', [100,100, 600*2, 600])
-        % h1 = subplot(1,2,1);
-        % mesh(XX,YY,cardFunctionU)
-        normcard = sqrt(cardFunctionU.^2+cardFunctionV.^2);
-        quiver(XX,YY,cardFunctionU,cardFunctionV,max(max(normcard)))
-        % axis tight
+        % normcard = sqrt(cardFunctionU.^2 + cardFunctionV.^2);
+        % quiver(XX,YY,cardFunctionU,cardFunctionV,max(max(normcard)))
+        quiver(XX,YY,cardFunctionU,cardFunctionV)
+        set(gca, 'FontSize',14)  % Increasing ticks fontsize
         axis([-1 1 -1 1])
-        hold on, plot(X,Y,'.k','markersize',20)
+        hold on
+        plot(X,Y,'.k','markersize',20)
         plot(X(i,j),Y(i,j),'or','markersize',20), hold off
-        title(['Cardinal Function U for (i,j) = (' num2str(i) ',' ...
-               num2str(j) ')'],'FontSize',15)
-    
-        % h2 = subplot(1,2,2);
-        % mesh(XX,YY,cardFunctionV)
-        % axis([-1 1 -1 1 -.5 1])
-        % title(['Cardinal Function V for (i,j) = (' num2str(i) ',' ...
-        %        num2str(j) ')'])
-        %
-        % set([h1 h2], 'clim', [-.5 1])
+        Title = 'Cardinal function ';
+        if p <= n^2
+            Title = [Title '$u$ at '];
+        else
+            Title = [Title '$v$ at '];
+        end
+        Title = [Title '$(' num2str(X(i,j),'%2.2f') ',' ...
+                 num2str(Y(i,j),'%2.2f') ')$'];
+        title(Title, 'Interpreter','latex', 'FontSize',20)
+        xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+        ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
+
         snapnow
         pause
     end

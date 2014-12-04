@@ -12,8 +12,8 @@ clc, clear
 k1 = 7; k2 = 7;       % Control the amout of vortices on the testFunction
 p = [0 0];            % Point to measure the error on the derivatives
 ep = 2;               % Shape parameter
-randomGrid = false;    % Use a random grid
-nn = 11:2:300;       % Points on the unit square
+randomGrid = true;    % Use a random grid
+nn = 11:10:300;       % Points on the unit square
 rbf = @(e,r) exp(-(e*r).^2);
 
 h = zeros(size(nn));  % Fill distance vector
@@ -104,8 +104,8 @@ fprintf('Rate of decay for vy: h^(%f)\n', p_vy(1))
 k = floor(length(nn)*(.9));  % index to place h^2 and h^4 on the plot
 
 figure(1)
-loglog(h,uxErr,'ro', h,uyErr,'bo', h,h.^2,'b--', h,h.^4,'r--')
-axis tight
+loglog(h,uxErr,'ro', h,uyErr,'bs', h,h.^2,'b--', h,h.^4,'r--')
+xlim([h(1) h(end)])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend(['$$u_x$$: $$h^{', num2str(p_ux(1),3), '}$$'], ...
             ['$$u_y$$: $$h^{', num2str(p_uy(1),3), '}$$'], ...
@@ -120,10 +120,9 @@ title('Error on $$u$$ derivatives: RBF-FD', 'Interpreter','latex', ...
 xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
 ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
-
 figure(2)
-loglog(h,vxErr,'ro', h,vyErr,'bo', h,h.^2,'r--', h,h.^4,'b--')
-axis tight
+loglog(h,vxErr,'ro', h,vyErr,'bs', h,h.^2,'r--', h,h.^4,'b--')
+xlim([h(1) h(end)])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend(['$$v_x$$: $$h^{', num2str(p_vx(1),3), '}$$'], ...
             ['$$v_y$$: $$h^{', num2str(p_vy(1),3), '}$$'], ...

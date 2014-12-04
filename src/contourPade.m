@@ -6,17 +6,18 @@
 
 %% Setting up the script
 clear, clc
-n = 7;      % sqrt root of number of data sites
 
-% rbf = @(ep,r) exp(-(ep*r).^2);
-rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;  % beta = 2
+n = 3;      % sqrt root of number of data sites
+rbf = @(ep,r) exp(-(ep*r).^2);
+% rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;  % beta = 2
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2);
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
 
-s = linspace(0,2*pi,1000);  % to plot the circle
-rho = 1/(2*sqrt(2)) - .03;  % radius of the circle
+s = linspace(0,2*pi,1000);   % to plot the circle
+rho = 1/(2*sqrt(2)) - 0.03;  % radius of the circle
 e0 = 0;
-complexPlane = true;
+complexPlane = false;
+allPoints = false;
 
 if complexPlane
     e = 0.001:0.05/4:1;
@@ -26,18 +27,27 @@ else
     ep = rho*exp(1i*s) + e0;
 end
 
-%% Generating the 2d grid of n^2 equispaced nodes
-x = linspace(-1,1,n);
+%% Generating the 2d grid, finner grid and U and V at data sites
+if allPoints
+    x = linspace(-1,1,n);
+    [X,Y] = meshgrid(x);
+    center = ceil(n/2);
+    U = zeros(n); U(center, center) = 1;
+    V = zeros(n);
+else
+    X = [0 0 1  0 -1];
+    Y = [0 1 0 -1  0];
+    U = [1 0 0  0  0];
+    V = [0 0 0  0  0];
+end
+dSites = [X(:) Y(:)];    % data points
+
 if complexPlane
     xx = .75;
 else
     xx = linspace(-1,1,11*n);
 end
-
-[X,Y] = meshgrid(x);
 [XX,YY] = meshgrid(xx);
-
-dSites = [X(:) Y(:)];    % data points
 ePoints = [XX(:) YY(:)]; % evaluation points
 
 %% Calculating RBF interpolant
@@ -48,13 +58,10 @@ d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
 [~, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2, true); %Just for Aep
 
-% U = [0 0 0; 0 1 0; 0 0 0];
-center = ceil(n/2);
-U = zeros(n); U(center, center) = 1;
-V = zeros(n);
 
 t = [U(:) V(:)];
-d = zeros(2*n^2,1);
+
+d = zeros(2*size(t,1),1);
 d(1:2:end) = t(:,1);
 d(2:2:end) = t(:,2);
 
@@ -114,17 +121,15 @@ end
 %% Calculating the interpolant when the shape parameter is zero
 % For this we will use the Cauchy's intergral formula
 
-
 if (size(ep,1) == 1) || (size(ep,2) == 1)
     interpUatEps0 = 1/(2*pi) * squeeze(trapz(s, interpU));
     interpVatEps0 = 1/(2*pi) * squeeze(trapz(s, interpV));
 
     figure(2)
-    
+    set(gcf, 'Position',[50 50 2*500 1*300])
     h1 = subplot(1,2,1);
     mesh(XX,YY,real(interpUatEps0))
-    title(['Interpolant of $u$ at $\epsilon = ' num2str(e0), ...
-           '$, $\rho = ', num2str(rho,'%2.2e'), '$'], ...
+    title(['Interpolant $u$ at $\varepsilon = ' num2str(e0), '$'], ...
            'Interpreter','latex', 'FontSize',20)
     xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
     ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
@@ -132,8 +137,7 @@ if (size(ep,1) == 1) || (size(ep,2) == 1)
     
     h2 = subplot(1,2,2);
     mesh(XX,YY,real(interpVatEps0))
-    title(['Interpolant of $v$ at $\epsilon = ' num2str(e0), ...
-           '$, $\rho = ', num2str(rho,'%2.2e'), '$'], ...
+    title(['Interpolant $v$ at $\varepsilon = ' num2str(e0), '$'], ...
            'Interpreter','latex', 'FontSize',20)
     xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
     ylabel('$y$', 'Interpreter','latex', 'FontSize',18)

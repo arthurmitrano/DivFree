@@ -9,6 +9,7 @@ clear, clc, close all
 
 rbf = @(e,r) exp(-(e*r).^2);
 shapeParameters = [2 5 10];
+style = {'r.-','go-','bs-','m^-','cv-','y*-'};
 totalPoints = 3:2:13;
 
 %% Calculating the constants for the RBF interpolant
@@ -32,8 +33,11 @@ end
 %% Plotting the Lebesgue constants for the RBF interpolant
 figure(1)
 set(gcf, 'Position', [100,100, 800, 500])
-semilogy(totalPoints,constRBF,'.-', 'MarkerSize',12)
+semilogy(totalPoints,constRBF(:,1),style{1}, 'MarkerSize',12)
 hold on
+for j = 2:length(shapeParameters)
+    semilogy(totalPoints,constRBF(:,j),style{j}, 'MarkerSize',12)
+end
 
 %%
 % We can see here that the shape parameter chages the rate of growth of the
@@ -52,15 +56,28 @@ for n = totalPoints
     constPoly(i) = lebesgueFunctions(n,n+4);
 
     % Testing for points close to Chebyshev points
-    % constPoly(i) = lebesgueFunctions(n,n+4,n,false,0.001);
+    % constPoly(i) = lebesgueFunctions(n,n+4,false,0.001);
     i = i + 1;
     toc
 end
 
+%% Lebesgue constant for polynomial interpolant on Chebyshev nodes
+display('Polynomial divergence-free interpolant on Chebyshev nodes')
+constPolyCheb = zeros(length(totalPoints),1);
+
+i = 1;
+for n = totalPoints
+    fprintf('n = %i\n',n)
+    tic
+    constPolyCheb(i) = lebesgueFunctions(n,n+4,false,0);
+    i = i + 1;
+    toc
+end
+constPolyCheb
 %% Plotting the Lebesgue constant for the polynomial interpolant
-semilogy(totalPoints,constPoly,'.--k', 'MarkerSize',12)
+semilogy(totalPoints,constPoly,'k.--', 'MarkerSize',12)
 axis tight
-set(gca, 'FontSize', 14)  % Increasing ticks fontsize
+set(gca, 'FontSize',14)  % Increasing ticks fontsize
 legends(end) = {'polynomial'};
 title('RBF vs Polynomial divergence-free interpolants', ...
       'Interpreter','latex', 'FontSize',20)
@@ -126,5 +143,7 @@ for n = totalPoints
 end
 
 %% Table of Kosloff & Tal-Ezer parameters and Lebesgue constants (Poly)
-rows = num2str(totalPoints); columns = 'LebesgueConst alpha';
-printmat([minConstPoly, alphasPoly],'PolyCase', rows, columns)
+rows = num2str(totalPoints); columns = ...
+    'LebesgueConst alpha LebesgueConstCheb';
+printmat([minConstPoly, alphasPoly, constPolyCheb],'PolyCase', ...
+         rows, columns)

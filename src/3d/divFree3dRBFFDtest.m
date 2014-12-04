@@ -6,9 +6,10 @@
 %% Setting up the script
 clc, clear
 
-p = [0 0 0];          % Point to measure the error
-ep = 3;               % Shape parameter
-nn = 11:10:200;       % Points on the unit cube
+p = [0 0 0];         % Point to measure the error
+ep = 8;              % Shape parameter
+randomGrid = false;  % Use a random grid
+nn = 11:4:150;       % Points on the unit cube
 rbf = @(e,r) exp(-(e*r).^2);
 
 h = zeros(size(nn));  % Fill distance vector
@@ -30,9 +31,16 @@ i = 1;
 for n = nn
     n, tic
     % Generating the center grid ------------------------------------------
-    [X, Y, Z] = meshgrid(linspace(-1,1,n));
-
-    dSites = [X(:) Y(:) Z(:)];
+    if randomGrid
+        % Random points -------------------
+        dSites = [p; -1+2*rand(n^3-1,3)];
+        % ---------------------------------
+    else
+        % Rectangular grid -----------------
+        [X, Y, Z] = meshgrid(linspace(-1,1,n));
+        dSites = [X(:) Y(:) Z(:)];
+        % ----------------------------------
+    end
     dSites = nearstNeighbors(dSites, p, 27);
 
     d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
@@ -45,9 +53,9 @@ for n = nn
     % ---------------------------------------------------------------------
     
     % Getting testFunction values -----------------------------------------
-    F1 = @(x,y,z) sin((x-1).^2 + (y-1).^2 + (z-1).^2);
-    F2 = @(x,y,z) cos((x-.5).^2 + (y-.5).^2 + (z-.5).^2);
-    F3 = @(x,y,z) tanh((x+.5).^2 + (y-1).^2 + (z+1).^2);
+    F1 = @(x,y,z) sin((x - 1).^2 + (y - 1).^2 + (z - 1).^2);
+    F2 = @(x,y,z) cos((x - .5).^2 + (y - .5).^2 + (z - .5).^2);
+    F3 = @(x,y,z) tanh((x + .5).^2 + (y - 1).^2 + (z + 1).^2);
     
     [u, v, w, Du, Dv, Dw] = testFunction3d(dSites, p, F1,F2,F3);
     t = [u(:) v(:) w(:)];
@@ -139,9 +147,9 @@ fprintf('Rate of decay for wz: h^(%f)\n', p_wz(1))
 k = floor(length(nn)*(.9));  % index to place h^2 and h^4 on the plot
 
 figure(1)
-loglog(h,DuErr.x,'ro', h,DuErr.y,'bo', h,DuErr.z,'ko', ...
+loglog(h,DuErr.x,'ro', h,DuErr.y,'bs', h,DuErr.z,'k^', ...
        h,h.^2,'c--', h,h.^4,'m--')
-axis tight
+xlim([h(1) h(end)])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend(['$$u_x$$: $$h^{', num2str(p_ux(1),3), '}$$'], ...
             ['$$u_y$$: $$h^{', num2str(p_uy(1),3), '}$$'], ...
@@ -158,9 +166,9 @@ xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
 ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
 figure(2)
-loglog(h,DvErr.x,'ro', h,DvErr.y,'bo', h,DvErr.z,'ko', ...
+loglog(h,DvErr.x,'ro', h,DvErr.y,'bs', h,DvErr.z,'k^', ...
        h,h.^2,'c--', h,h.^4,'m--')
-axis tight
+xlim([h(1) h(end)])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend(['$$v_x$$: $$h^{', num2str(p_vx(1),3), '}$$'], ...
             ['$$v_y$$: $$h^{', num2str(p_vy(1),3), '}$$'], ...
@@ -177,9 +185,9 @@ xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
 ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
 figure(3)
-loglog(h,DwErr.x,'ro', h,DwErr.y,'bo', h,DwErr.z,'ko', ...
+loglog(h,DwErr.x,'ro', h,DwErr.y,'bs', h,DwErr.z,'k^', ...
        h,h.^2,'c--', h,h.^4,'m--')
-axis tight
+xlim([h(1) h(end)])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend(['$$w_x$$: $$h^{', num2str(p_wx(1),3), '}$$'], ...
             ['$$w_y$$: $$h^{', num2str(p_wy(1),3), '}$$'], ...

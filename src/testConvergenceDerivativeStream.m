@@ -2,10 +2,10 @@
 clc, clear
 
 k1 = 7; k2 = 7;     % control the amout of vortices on the testFunction
-N = 5;              % Degree of the bivariate polynomial stream function
+N = 3;              % Degree of the bivariate polynomial stream function
 p = [0 0];          % Point to measure the error
-randomGrid = true;  % Use a random grid
-nn = 11:10:500;
+randomGrid = false;  % Use a random grid
+nn = 11:10:200;
 
 h = zeros(size(nn));  % Fill distance
 uxErr = []; uyErr = []; vxErr = []; vyErr = []; % Derivative errors
@@ -94,8 +94,8 @@ fprintf('Rate of decay for vy: h^(%f)\n', p_vy(1))
 k = floor(length(nn)*(.9));  % index to place h^2 and h^4 on the plot
 
 figure(1)
-loglog(h,uxErr,'ro', h,uyErr,'bo', h,h.^2,'b--', h,h.^4,'r--')
-axis tight
+loglog(h,uxErr,'ro', h,uyErr,'bs', h,h.^2,'b--', h,h.^4,'r--')
+xlim([h(1) h(end)])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend(['$$u_x$$: $$h^{', num2str(p_ux(1),3), '}$$'], ...
             ['$$u_y$$: $$h^{', num2str(p_uy(1),3), '}$$'], ...
@@ -111,8 +111,8 @@ xlabel('$$h$$', 'Interpreter','latex', 'FontSize',18)
 ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
 figure(2)
-loglog(h,vxErr,'ro', h,vyErr,'bo', h,h.^2,'r--', h,h.^4,'b--')
-axis tight
+loglog(h,vxErr,'ro', h,vyErr,'bs', h,h.^2,'r--', h,h.^4,'b--')
+xlim([h(1) h(end)])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend(['$$v_x$$: $$h^{', num2str(p_vx(1),3), '}$$'], ...
             ['$$v_y$$: $$h^{', num2str(p_vy(1),3), '}$$'], ...

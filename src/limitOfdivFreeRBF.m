@@ -8,13 +8,13 @@
 %% Setting up the script
 clear, clc
 n = 3;      % number of points
-N = 5;      % degree of the polynomial interpolant
+N = 9;      % degree of the polynomial interpolant
 alpha = 1;  % 1: equally-spaced; 0: cheb points
 % rbf = @(ep,r) exp(-(ep*r).^2);
 rbf = @(ep,r) 1./(1 + (ep*r).^2);
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2);
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
-ep = sym(1/100);
+ep = sym(1/10000000000);
 
 %% Generating the 2d grid of n^2 equispaced nodes
 % xCheb = sort(cos(pi*(0:n-1)/(n-1)));
@@ -24,7 +24,6 @@ ep = sym(1/100);
 %     x = xCheb;
 % end
 x = linspace(-1,1,n);
-h = x(2) - x(1);  % h is only used if alpha = 1 in FD_DivFreeMatrixStream
 xx = linspace(-1,1,11*n); % always use an odd number of points to plot the
                           % interpolation points.
 
@@ -41,7 +40,7 @@ d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
 [A, F, G] = RBF_DivFreeMatrix(r, d1, d2, rbf, ep);
 
 %%
-U = [1 0 0; 0 0 0; 0 0 0]; V = [0 0 0; 0 0 0; 0 0 0];
+U = [0 0 0; 0 1 0; 0 0 0]; V = [0 0 0; 0 0 0; 0 0 0];
 t = sym([U(:) V(:)]);
 d = reshape(t.', 1, numel(t)).';
 coeffsSym = A\d;
@@ -58,14 +57,9 @@ interpV = reshape(interp(:,2), size(XX));
 %% Checking if RBF interpolant is close to polynomial
 % The idea is to use the divergence-free polynomial and look to the
 % residual between those interpolants.
+[M, polyInterpU, polyInterpV] = FD_DivFreeMatrixStream(dSites, N);
 
-uIdx = find(ones(n));
-vIdx = find(ones(n));
-interpPts = struct('u', uIdx,'v', vIdx, 'numPts',n); 
-
-[M, polyInterpU, polyInterpV] = FD_DivFreeMatrixStream(h, N, ...
-                                                       interpPts, alpha);
-coeffsP = M\[U(uIdx); V(vIdx)];
+coeffsP = M\[U(:); V(:)];
 
 resU = max(max(abs(polyInterpU(XX,YY,coeffsP) - double(interpU))))
 resV = max(max(abs(polyInterpV(XX,YY,coeffsP) - double(interpV))))
@@ -76,14 +70,17 @@ set(gcf, 'Position', [100,100, 600*2, 600])
 h1 = subplot(1,2,1);
 mesh(XX,YY,polyInterpU(XX,YY,coeffsP))
 axis([-1 1 -1 1 -.5 1])
-title('polynomial interpolant for U','FontSize',15)
-xlabel('x'), ylabel('y')
+title('Polynomial interpolant for $u$', 'Interpreter','latex', ...
+      'FontSize',20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
 
 h2 = subplot(1,2,2);
 mesh(XX,YY,double(interpU))
 axis([-1 1 -1 1 -.5 1])
-title('RBF interpolant for U','FontSize',15)
-xlabel('x'), ylabel('y')
+title('RBF interpolant for $u$', 'Interpreter','latex', 'FontSize',20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
 
 set([h1 h2], 'clim', [-.5 1])
 
@@ -92,13 +89,24 @@ set(gcf, 'Position', [100,100, 600*2, 600])
 h3 = subplot(1,2,1);
 mesh(XX,YY,polyInterpV(XX,YY,coeffsP))
 axis([-1 1 -1 1 -.5 1])
-title('polynomial interpolant for V','FontSize',15)
-xlabel('x'), ylabel('y')
+title('Polynomial interpolant for $v$', 'Interpreter','latex', ...
+      'FontSize',20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
 
 h4 = subplot(1,2,2);
 mesh(XX,YY,double(interpV))
 axis([-1 1 -1 1 -.5 1])
-title('RBF interpolant for V','FontSize',15)
-xlabel('x'), ylabel('y')
+title('RBF interpolant for $v$', 'Interpreter','latex', 'FontSize',20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+ylabel('$y$', 'Interpreter','latex', 'FontSize',18)
 
 set([h3 h4], 'clim', [-.5 1])
+
+%%
+% As we can see from the plots the RBF interpolant seems to converge to
+% some function that is different than the divergence-free polynomial
+% interpolant. However, this doesn't mean that the limit of the
+% divergence-free RBFs is not a polynomial, since it might be still a
+% polynomial just of a different form than how we are constructing our
+% divergence-free polyomial.

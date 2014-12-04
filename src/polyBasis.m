@@ -1,7 +1,7 @@
 %% Investigating the polynomial basis
-% This script has the objective of analysing which terms should be use on the
-% polynomial expression of the stream function $\psi$ when we use a 9 points
-% stencil.
+% This script has the objective of analysing which terms should be use on
+% the polynomial expression of the stream function $\psi$ when we use a 9
+% points stencil.
 
 %% Setting up the script
 clear, clc, close all

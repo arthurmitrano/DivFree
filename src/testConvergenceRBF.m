@@ -9,7 +9,7 @@ k1 = 7; k2 = 7;       % Control the amout of vortices on the testFunction
 p = [0 0];            % Point to measure the error on the derivatives
 ep = 2;               % Shape parameter
 randomGrid = false;   % Use a random grid
-nn = 3:2:15;          % Points on the unit square
+nn = 7:2:41;          % Points on the unit square
 rbf = @(e,r) exp(-(e*r).^2);
 
 h = zeros(size(nn));  % Fill distance vector
@@ -128,7 +128,7 @@ end
 
 %% Plotting error decay
 figure(1)
-semilogy(nn,divFree.u,'ro', nn,regular.u,'bo')
+semilogy(nn,divFree.u,'ro', nn,regular.u,'bs')
 axis tight
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend('Divergence-free method','Traditional method', ...
@@ -139,7 +139,7 @@ xlabel('$$\sqrt{N}$$', 'Interpreter','latex', 'FontSize',18)
 ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 
 figure(2)
-semilogy(nn,divFree.v,'ro', nn,regular.v,'bo')
+semilogy(nn,divFree.v,'ro', nn,regular.v,'bs')
 axis tight
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
 id = legend('Divergence-free method','Traditional method', ...
@@ -153,10 +153,10 @@ ylabel('Error', 'Interpreter','latex', 'FontSize',18)
 figure(3)
 quiver(ePoints(:,1),ePoints(:,2), ttDivFree(:,1), ttDivFree(:,2), 'b')
 hold on
-quiver(dSites(:,1),dSites(:,2), t(:,1), t(:,2), 'r')
+quiver(dSites(:,1),dSites(:,2), t(:,1), t(:,2), 'r', 'LineWidth', 2.5)
 axis([-1 1 -1 1])
 set(gca, 'FontSize', 14)  % Increasing ticks fontsize
-title('Interpolant (blue) and vector field (red)', ...
+title('Interpolant (blue) and vector field {\bf (red)}', ...
       'Interpreter','latex', 'FontSize',20)
 xlabel('$$x$$', 'Interpreter','latex', 'FontSize',18)
 ylabel('$$y$$', 'Interpreter','latex', 'FontSize',18)

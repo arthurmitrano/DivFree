@@ -7,8 +7,8 @@ clear, clc, close all
 
 %%
 
-% rbf = @(ep,r) exp(-(ep*r).^2);        % gaussian
-rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;   % inverse multiquadric (beta = 2)
+rbf = @(ep,r) exp(-(ep*r).^2);        % gaussian
+% rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;     % inverse multiquadric (beta = 2)
 % rbf = @(ep,r) 1./(1 + (ep*r).^2);     % inverse quadratic - not + def R^2
 % rbf = @(ep,r) 1./sqrt(1 + (ep*r).^2); % IM - not strictly + def. in R^2
 % rbf = @(ep,r) sqrt(1 + (ep*r).^2);
@@ -16,13 +16,19 @@ rbf = @(ep,r) 1./(1 + (ep*r).^2)^2;   % inverse multiquadric (beta = 2)
 pointwise = true;  % false: take the limit ep->0 symbolically at (X,Y)
                    % true : evaluate the interp at (XX,YY) and then take
                    %        the "limit" (use ep small, take the limit
-                   %        with chebfun or take the simbolic limit).
+                   %        with chebfun or take the symbolic limit).
 
 %% Evaluation and data points
-X = [0 -1 -1  1 1 1 0 -1  0];
-Y = [0 -1  1 -1 1 0 1  0 -1];
-U = [1  0  0  0 0 0 0  0  0];
-V = [0  0  0  0 0 0 0  0  0];
+% 5 interpolation points
+% X = [0 1 0 -1  0];
+% Y = [0 0 1  0 -1];
+% U = [1 0 0  0  0];
+% V = [0 0 0  0  0];
+% 9 interpolation points
+X = [0 1 -1 -1  1 1 0 -1  0];
+Y = [0 1 -1  1 -1 0 1  0 -1];
+U = [1 0  0  0  0 0 0  0  0];
+V = [0 0  0  0  0 0 0  0  0];
 
 t = [U(:) V(:)];
 d = zeros(2*numel(U),1);
@@ -45,7 +51,7 @@ ep = rho*exp(1i*s) + e0;
 r = DistanceMatrix(dSites, dSites);
 d1 = DifferenceMatrix(dSites(:,1), dSites(:,1));
 d2 = DifferenceMatrix(dSites(:,2), dSites(:,2));
-[~, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2); %Just for Aep
+[~, F, G, Aep] = RBF_DivFreeMatrix(r, d1, d2, rbf, 2, true); %Just for Aep
 
 r_ePoints = DistanceMatrix(ePoints, dSites);
 d1_ePoints = DifferenceMatrix(ePoints(:,1), dSites(:,1));
@@ -164,14 +170,18 @@ set(gcf, 'Position', [100 100 2*500 1*500])
 
 h1 = subplot(1,2,1);
 mesh(XX,YY,L1(XX,YY))
-title('interpolant of U (symbolic)', 'FontSize', 15)
-xlabel('x', 'FontSize',13), ylabel('y', 'FontSize',13)
+title('Interpolant of $u$ (symbolic)', 'Interpreter','latex', ...
+      'FontSize', 20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+xlabel('$y$', 'Interpreter','latex', 'FontSize',18)
 zlim([-.5 1])
 
 h2 = subplot(1,2,2);
 mesh(XX,YY,L2(XX,YY))
-title('interpolant of V (symbolic)', 'FontSize', 15)
-xlabel('x', 'FontSize',13), ylabel('y', 'FontSize',13)
+title('Interpolant of $v$ (symbolic)', 'Interpreter','latex', ...
+      'FontSize', 20)
+xlabel('$x$', 'Interpreter','latex', 'FontSize',18)
+xlabel('$y$', 'Interpreter','latex', 'FontSize',18)
 zlim([-.5 1])
 
 set([h1 h2], 'clim', [-.5 1])

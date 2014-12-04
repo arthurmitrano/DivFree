@@ -5,7 +5,15 @@
 % interpolant $(u_{interp}, v_{interp})$. For more information on how this
 % polynomial is constructed see <FD_DivFreeMatrixStream.html
 % FD_divFreeMatrixStream.html>.
-
+%
+%  Calculates Lebesgue function and it's constant.
+%
+%  n       : Number of grid points in one dimension
+%  N       : Degree of the bivariate interpolation polynomial
+%  display : Display the cardinal function plots (optinal)
+%  alpha   : Kosloff & Tal-Ezer parameter (default = 1)
+%
+%  NOTE: n must be odd numbers.
 %%
 function lebesgueConst = lebesgueFunctions(n,N,display,alpha)
 %  Calculates Lebesgue function and it's constant.
